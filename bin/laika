@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var Phantom = require('node-phantom');
+var colors = require('colors');
 var Injector = require('../lib/injector');
 var ServerConnector = require('../lib/connectors/server.js');
 var ClientConnector = require('../lib/connectors/client.js');
@@ -14,16 +15,16 @@ var phantom;
 process.argv.push('--recursive');
 process.argv.push('tests');
 
-console.info('injecting laika...');
+console.info('\n  injecting laika...'.blue.bold);
 injector.inject();
-console.info('loading phantomjs...');
+console.info('  loading phantomjs...'.blue.bold);
 Phantom.create(function(err, ph) {
   if(err) {
-    console.log('please install phantomjs to countinue');
+    console.log('  please install phantomjs to countinue'.red.bold);
     throw err; 
   } else {
     phantom = ph;
-    console.log('waiting 3 seconds to server to get reloaded...');
+    console.log('  waiting 3 seconds to server to get reloaded...'.blue.bold);
     setTimeout(function() {
       require('mocha/bin/_mocha');
     }, 3000);
@@ -65,3 +66,8 @@ laika = function(callback) {
     }
   }
 }
+
+process.on('exit', function() {
+  console.log('  cleaning up injected code\n'.blue.bold);
+  injector.clean();
+});

@@ -6,7 +6,8 @@
     "handlebars": "1.0.x",
     "mkdirp": "0.3.x",
     "mocha": "1.x",
-    "node-phantom": "https://github.com/arunoda/node-phantom/archive/master.tar.gz"
+    "node-phantom": "https://github.com/arunoda/node-phantom/archive/master.tar.gz",
+    "colors": "0.6.x"
   },
   "devDependencies": {
     "fibers": "1.0.x"
