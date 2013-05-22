@@ -22,4 +22,4 @@ var server = net.createServer(function(socket) {
   }
 });
 
-server.listen({{port}});
+server.listen(10840);

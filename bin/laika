@@ -1,0 +1,67 @@
+#!/usr/bin/env node
+
+var Phantom = require('node-phantom');
+var Injector = require('../lib/injector');
+var ServerConnector = require('../lib/connectors/server.js');
+var ClientConnector = require('../lib/connectors/client.js');
+var helpers = require('../lib/helpers');
+
+var serverPort = helpers.getRandomPort();
+var injector = new Injector({serverPort: serverPort});
+var phantom;
+
+//add --recursive tests argvs
+process.argv.push('--recursive');
+process.argv.push('tests');
+
+console.info('injecting laika...');
+injector.inject();
+console.info('loading phantomjs...');
+Phantom.create(function(err, ph) {
+  if(err) {
+    console.log('please install phantomjs to countinue');
+    throw err; 
+  } else {
+    phantom = ph;
+    console.log('waiting 3 seconds to server to get reloaded...');
+    setTimeout(function() {
+      require('mocha/bin/_mocha');
+    }, 3000);
+  }
+});
+
+laika = function(callback) {
+  return function (done) {    
+    var completed = false;
+    var args = [];
+
+    if(callback.length == 0) {
+      args = [];
+    } else if(callback.length == 1) {
+      args = [cleanAndDone];
+    } else if(callback.length == 2) {
+      args = [cleanAndDone, new ServerConnector(serverPort)];
+    } else {
+      args = [cleanAndDone, new ServerConnector(serverPort)];
+      var noClients = callback.length - 2;
+      for(var lc = 0; lc<noClients; lc++) {
+        args.push(new ClientConnector(phantom));
+      }
+    }
+
+    callback.apply(null, args);
+    if(args.length == 0) {
+      done();
+    }
+
+    function cleanAndDone() {
+      if(!completed) {
+        args.slice(1).forEach(function(connector) {
+          connector.close();
+        });
+        done();
+        completed = true;        
+      }
+    }
+  }
+}
