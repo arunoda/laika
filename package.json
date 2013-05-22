@@ -1,0 +1,9 @@
+{
+  "name": "meteor-suite",
+  "version": "0.1.0",
+  "description": "Full Featured Test Suite for Meteor",
+  "dependencies": {
+    "handlebars": "1.0.x",
+    "mkdirp": "0.3.x"
+  }
+}
