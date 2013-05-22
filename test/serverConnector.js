@@ -20,6 +20,7 @@ suite('ServerConnector', function() {
         calltest(100)
       }).result(function(num) {
         assert.equal(num, 100);
+        sc.close();
         done();
       });
     }, 200);
@@ -47,6 +48,7 @@ suite('ServerConnector', function() {
         calltest(100);
       }).result(function(num) {
         assert.equal(num, 100);
+        sc.close();
         done();
       });
     }, 200);
