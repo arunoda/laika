@@ -17,13 +17,15 @@ suite('ServerConnector', function() {
     setTimeout(function() {
       var sc = new ServerConnector(port);
       sc.run(function() {
-        calltest(100)
-      }).result(function(num) {
+        emit('response', 100)
+      });
+
+      sc.on('response', function(num) {
         assert.equal(num, 100);
         sc.close();
         done();
       });
-    }, 200);
+    }, 20);
   });
 
   test('run fibered code', function(done) {
@@ -39,19 +41,22 @@ suite('ServerConnector', function() {
       sc.run(function() {
         var Future = Npm.require('fibers/future');
         var f = new Future();
-        
+        var a = 10;
         Meteor.setTimeout(function() {
+          a = 100;
           f.return();
-        }, 100);
+        }, 3);
         f.wait();
 
-        calltest(100);
-      }).result(function(num) {
+        emit('result', a);
+      });
+
+      sc.on('result', function(num) {
         assert.equal(num, 100);
         sc.close();
         done();
       });
-    }, 200);
+    }, 20);
   });
 });
 

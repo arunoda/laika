@@ -4,9 +4,13 @@
   "description": "Full Featured Test Suite for Meteor",
   "dependencies": {
     "handlebars": "1.0.x",
-    "mkdirp": "0.3.x"
+    "mkdirp": "0.3.x",
+    "mocha": "1.x"
   },
   "devDependencies": {
     "fibers": "1.0.x"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha -u tdd -R spec --recursive test"
   }
 }
