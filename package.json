@@ -1,6 +1,6 @@
 {
-  "name": "meteor-suite",
-  "version": "0.1.0",
+  "name": "laika",
+  "version": "0.1.1",
   "description": "Full Featured Test Suite for Meteor",
   "dependencies": {
     "handlebars": "1.0.x",
@@ -10,6 +10,9 @@
   },
   "devDependencies": {
     "fibers": "1.0.x"
+  },
+  "bin": {
+    "laika": "./bin/laika"
   },
   "scripts": {
     "test": "node_modules/.bin/mocha -u tdd -R spec -t 0 --recursive test"

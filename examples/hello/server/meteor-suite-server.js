@@ -18,8 +18,8 @@ var server = net.createServer(function(socket) {
 
   function emit() {
     var argsJson = JSON.stringify(arguments);
-    socket.write(argsJson);
+    socket.write(argsJson + '#DTF#');
   }
 });
 
-server.listen(10840);
+server.listen(10074);

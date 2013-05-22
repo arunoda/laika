@@ -1,11 +1,10 @@
-meteor-suite
-============
+laika
+=====
 
-Full Featured Test Suite for Meteor
+### Full Featured Test Suite for Meteor
 
 ## Todo
 
 * Send args to server method
-* Data Transfer Protocol from server to client
 * A way to refresh the db
-* mocha param alteration (tests folder)
+* add some utility methods to client (ensureLogin(), etc)

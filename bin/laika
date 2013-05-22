@@ -23,10 +23,10 @@ Phantom.create(function(err, ph) {
     throw err; 
   } else {
     phantom = ph;
-    console.log('waiting 3 seconds to server to get reloaded...');
-    setTimeout(function() {
-      require('mocha/bin/_mocha');
-    }, 3000);
+    // console.log('waiting 3 seconds to server to get reloaded...');
+    // setTimeout(function() {
+    // }, 3000);
+    require('mocha/bin/_mocha');
   }
 });
 
