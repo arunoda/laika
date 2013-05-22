@@ -3,13 +3,14 @@ var path = require('path');
 var fs = require('fs');
 var handlebars = require('handlebars');
 var ServerConnector = require('../lib/connectors/server.js');
+var helpers = require('../lib/helpers');
 
 var SERVER_TEMPLATE_LOCATION = path.resolve(__dirname, '../lib/injector/templates/server.js');
 
 suite('ServerConnector', function() {
   test('run in server and get result', function(done) {
     var Npm = {require: require};
-    var port = getRandomPort();
+    var port = helpers.getRandomPort();
     var template = handlebars.compile(fs.readFileSync(SERVER_TEMPLATE_LOCATION, 'utf8'));
     var serverCode = template({port: port});
     
@@ -31,7 +32,7 @@ suite('ServerConnector', function() {
   test('run fibered code', function(done) {
     var Npm = {require: require};
     var Meteor = {setTimeout: setTimeout};
-    var port = getRandomPort();
+    var port = helpers.getRandomPort();
     var template = handlebars.compile(fs.readFileSync(SERVER_TEMPLATE_LOCATION, 'utf8'));
     var serverCode = template({port: port});
     
@@ -59,7 +60,3 @@ suite('ServerConnector', function() {
     }, 20);
   });
 });
-
-function getRandomPort() {
-  return Math.ceil(Math.random() * 1000) + 10000;
-}

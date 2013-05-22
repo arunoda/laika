@@ -5,12 +5,13 @@
   "dependencies": {
     "handlebars": "1.0.x",
     "mkdirp": "0.3.x",
-    "mocha": "1.x"
+    "mocha": "1.x",
+    "node-phantom": "https://github.com/arunoda/node-phantom/archive/master.tar.gz"
   },
   "devDependencies": {
     "fibers": "1.0.x"
   },
   "scripts": {
-    "test": "node_modules/.bin/mocha -u tdd -R spec --recursive test"
+    "test": "node_modules/.bin/mocha -u tdd -R spec -t 0 --recursive test"
   }
 }

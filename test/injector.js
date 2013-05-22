@@ -1,12 +1,12 @@
 var Injector = require('../lib/injector');
-var Random = require('../lib/random');
+var helpers = require('../lib/helpers');
 var assert = require('assert');
 var path = require('path');
 var fs = require('fs');
 
 suite('Injector', function() {
   test('injecting for the first time', function(done) {
-    var folder = path.resolve('/tmp', Random.id(10));
+    var folder = path.resolve('/tmp', helpers.randomId(10));
     var injector = new Injector({
       serverPort: 7007,
       appDir: folder
@@ -22,7 +22,7 @@ suite('Injector', function() {
   });
 
   test('injecting for the second time', function(done) {
-    var folder = path.resolve('/tmp', Random.id(10));
+    var folder = path.resolve('/tmp', helpers.randomId(10));
     var injector = new Injector({
       serverPort: 7007,
       appDir: folder
@@ -44,7 +44,7 @@ suite('Injector', function() {
   });
 
   test('injecting and cleaning', function(done) {
-    var folder = path.resolve('/tmp', Random.id(10));
+    var folder = path.resolve('/tmp', helpers.randomId(10));
     var injector = new Injector({
       serverPort: 7007,
       appDir: folder
