@@ -25,6 +25,7 @@ suite('Posts', function() {
   }));
 
   test('insert in client and observe in client too', laika(function(done, server, c1, c2) {
+    var insertObject = { k: Math.random() };
     server.run(function() {
       Posts.remove({});
       emit('done');
@@ -45,17 +46,16 @@ suite('Posts', function() {
     }
 
     c1.on('done', function() {
-      c2.run(insertDoc);
+      c2.run(insertDoc, insertObject);
     });
 
-    function insertDoc() {
-      Posts.insert({k: 567});
+    function insertDoc(obj) {
+      Posts.insert(obj);
     }
 
     c1.on('doc', function(doc) {
-      if(doc.k == 567) {
-        done();
-      }
+      assert.equal(doc.k, insertObject.k);
+      done();
     });
   }));
 });

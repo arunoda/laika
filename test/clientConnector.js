@@ -50,6 +50,25 @@ suite('ClientConnector', function() {
       })
     })
   });
+
+  test('send args to the client and get result', function(done) {
+    var port = helpers.getRandomPort();
+    var server = createHttpServer(port);
+    var cc;
+    getPhantom(function(phantom) {
+      cc = new ClientConnector(phantom, 'http://localhost:' + port);
+      cc.run(function(a, b) {
+        emit('result', a + b);
+      }, 100, 200);
+
+      cc.on('result', function(val) {
+        assert.equal(val, 300);
+        server.close();
+        cc.close();
+        done();
+      })
+    })
+  });
 })
 
 function getPhantom(callback) {

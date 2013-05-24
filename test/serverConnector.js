@@ -75,4 +75,26 @@ suite('ServerConnector', function() {
       });
     }, 20);
   });
+
+  test('send arguments to server with the function', function(done) {
+    var Npm = {require: require};
+    var port = helpers.getRandomPort();
+    var template = handlebars.compile(fs.readFileSync(SERVER_TEMPLATE_LOCATION, 'utf8'));
+    var serverCode = template({injectPort: port});
+    
+    eval(serverCode);
+    setTimeout(function() {
+      var sc = new ServerConnector(port);
+      sc.run(function(a, b) {
+        emit('response', a + b)
+      }, 100, 200);
+
+      sc.on('response', function(num) {
+        assert.equal(num, 300);
+        sc.close();
+        done();
+      });
+    }, 20);
+  });
+
 });
