@@ -5,6 +5,8 @@ laika
 
 ## Todo
 
-* Send args to server method
-* A way to refresh the db
-* add some utility methods to client (ensureLogin(), etc)
+* Send args to the running code block
+* added a way to support custom actions both client and server
+* load app from a child_process
+* A way to refresh collections before using
+* add some utility methods(actions) to client (ensureLogin(), etc)

@@ -1,13 +1,14 @@
 {
   "name": "laika",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Full Featured Test Suite for Meteor",
   "dependencies": {
     "handlebars": "1.0.x",
     "mkdirp": "0.3.x",
     "mocha": "1.x",
     "node-phantom": "https://github.com/arunoda/node-phantom/archive/master.tar.gz",
-    "colors": "0.6.x"
+    "colors": "0.6.x",
+    "qbox": "0.1.x"
   },
   "devDependencies": {
     "fibers": "1.0.x"

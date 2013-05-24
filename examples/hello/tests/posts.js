@@ -25,7 +25,6 @@ suite('Posts', function() {
   }));
 
   test('insert in client and observe in client too', laika(function(done, server, c1, c2) {
-    
     server.run(function() {
       Posts.remove({});
       emit('done');
