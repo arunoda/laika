@@ -81,5 +81,4 @@ suite('Posts', function() {
       Posts.insert({a: 10});
     });
   }));
-
 });
