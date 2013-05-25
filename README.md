@@ -4,7 +4,7 @@ laika
 
 ![Laika Logo](http://arunoda.github.io/laika/images/logo.png)
 
-##[Documentation](http://arunoda.github.io/laika/images/logo.png)
+##[Documentation](http://arunoda.github.io/laika/)
 
 ## Todo
 * added a way to support custom actions both client and server
