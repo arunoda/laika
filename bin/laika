@@ -45,6 +45,8 @@ laika = function(callback) {
     var completed = false;
     var args = [];
 
+    //create new server with different db and port
+
     if(callback.length == 0) {
       args = [];
     } else if(callback.length == 1) {

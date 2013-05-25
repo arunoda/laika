@@ -2,7 +2,7 @@ var assert = require('assert');
 
 suite('Posts', function() {
   test('insert and observe', laika(function(done, server, client) {
-    server.run(function() {
+    server.eval(function() {
       Posts.remove({});
       Posts.find().observe({
         added: notifyTest
@@ -19,18 +19,18 @@ suite('Posts', function() {
       done();
     });
 
-    client.run(function() {
+    client.eval(function() {
       Posts.insert({a: 10});
     });
   }));
 
   test('insert in client and observe in client too', laika(function(done, server, c1, c2) {
     var insertObject = { k: Math.random() };
-    server.run(function() {
+    server.eval(function() {
       Posts.remove({});
       emit('done');
     }).on('done', function() {
-      c1.run(observePosts);
+      c1.eval(observePosts);
     })
 
     function observePosts() {
@@ -46,7 +46,7 @@ suite('Posts', function() {
     }
 
     c1.on('done', function() {
-      c2.run(insertDoc, insertObject);
+      c2.eval(insertDoc, insertObject);
     });
 
     function insertDoc(obj) {
@@ -58,4 +58,28 @@ suite('Posts', function() {
       done();
     });
   }));
+
+  test('insert and observe2', laika(function(done, server, client) {
+    server.eval(function() {
+      Posts.remove({});
+      Posts.find().observe({
+        added: notifyTest
+      })
+
+      function notifyTest(doc) {
+        emit('doc', doc);
+      }
+    });
+
+    server.on('doc', function(doc) {
+      delete doc._id;
+      assert.deepEqual(doc, {a: 10});
+      done();
+    });
+
+    client.eval(function() {
+      Posts.insert({a: 10});
+    });
+  }));
+
 });

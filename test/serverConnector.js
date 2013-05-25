@@ -18,7 +18,7 @@ suite('ServerConnector', function() {
     eval(serverCode);
     setTimeout(function() {
       var sc = new ServerConnector(port);
-      sc.run(function() {
+      sc.eval(function() {
         emit('response', 100)
       });
 
@@ -55,7 +55,7 @@ suite('ServerConnector', function() {
     eval(serverCode);
     setTimeout(function() {
       var sc = new ServerConnector(port);
-      sc.run(function() {
+      sc.eval(function() {
         var Future = Npm.require('fibers/future');
         var f = new Future();
         var a = 10;
@@ -85,7 +85,7 @@ suite('ServerConnector', function() {
     eval(serverCode);
     setTimeout(function() {
       var sc = new ServerConnector(port);
-      sc.run(function(a, b) {
+      sc.eval(function(a, b) {
         emit('response', a + b)
       }, 100, 200);
 

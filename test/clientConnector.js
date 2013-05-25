@@ -17,7 +17,7 @@ suite('ClientConnector', function() {
     var cc;
     getPhantom(function(phantom) {
       cc = new ClientConnector(phantom, 'http://localhost:' + port);
-      cc.run(function() {
+      cc.eval(function() {
         emit('result', 10);
       });
 
@@ -36,7 +36,7 @@ suite('ClientConnector', function() {
     var cc;
     getPhantom(function(phantom) {
       cc = new ClientConnector(phantom, 'http://localhost:' + port);
-      cc.run(function() {
+      cc.eval(function() {
         setTimeout(function() {
           emit('result', 120);
         })
@@ -57,7 +57,7 @@ suite('ClientConnector', function() {
     var cc;
     getPhantom(function(phantom) {
       cc = new ClientConnector(phantom, 'http://localhost:' + port);
-      cc.run(function(a, b) {
+      cc.eval(function(a, b) {
         emit('result', a + b);
       }, 100, 200);
 
