@@ -1,13 +1,10 @@
 laika
 =====
+Full Featured Test Suite for Meteor
 
-### Full Featured Test Suite for Meteor
+![Laika Logo](http://arunoda.github.io/laika/images/logo.png)
 
-## Setup
-
-* install meteor on your system (only for meteorite users)
-* run a seperate mongodb process with following options (it makes testing faster)
-`mongod --smallfiles --noprealloc --nojournal`
+##[Documentation](http://arunoda.github.io/laika/images/logo.png)
 
 ## Todo
 * added a way to support custom actions both client and server
