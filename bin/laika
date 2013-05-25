@@ -11,6 +11,12 @@ var qbox = require('qbox');
 
 // var injectPort = helpers.getRandomPort();
 // var injector = new Injector({injectPort: injectPort});
+var injectPort = helpers.getRandomPort();
+var notificationPort = helpers.getRandomPort();
+var injector = new Injector({
+  injectPort: injectPort,
+  notificationPort: notificationPort
+});
 var deps = qbox.create(2);
 var phantom;
 
@@ -18,17 +24,19 @@ var phantom;
 process.argv.push('--recursive');
 process.argv.push('tests');
 
-// deps.ready(function() {
-//   require('mocha/bin/_mocha');
-// });
+deps.ready(function() {
+  require('mocha/bin/_mocha');
+});
 // injector.on('ready', deps.tick.bind(qbox));
 // injector.on('interrupted', function() {
 //   console.log('  tests interrupted with app reload!\n  do not update the app while test is running.'.red.bold);
 //   process.exit(1);
 // });
 
-// console.info('\n  injecting laika...'.blue.bold);
-// injector.inject();
+console.info('\n  injecting laika...'.blue.bold);
+injector.inject();
+App.touch(deps.tick.bind(deps));
+
 console.info('  loading phantomjs...'.blue.bold);
 Phantom.create(function(err, ph) {
   if(err) {
@@ -36,7 +44,8 @@ Phantom.create(function(err, ph) {
     throw err; 
   } else {
     phantom = ph;
-    require('mocha/bin/_mocha');
+    deps.tick();
+    // require('mocha/bin/_mocha');
   }
 });
 
@@ -46,22 +55,16 @@ laika = function(callback) {
     var args = [];
 
     //create new server with different db and port
-    var injectPort = helpers.getRandomPort();
-    var notificationPort = helpers.getRandomPort();
     var appPort = helpers.getRandomPort();
     var mongoDbname = helpers.randomId(10);
     var appUrl = "http://localhost:" + appPort;
 
+    injector.resetStatus();
     var app = new App();
-    var injector = new Injector({
-      injectPort: injectPort,
-      notificationPort: notificationPort
-    });
-    injector.inject();
     app.start(mongoDbname, appPort);
 
     var d = Date.now();
-    injector.on('ready', function() {
+    injector.once('ready', function() {
       console.log(Date.now() -d);
       if(callback.length == 0) {
         args = [];
@@ -93,7 +96,6 @@ laika = function(callback) {
     }
 
     function completeTest() {
-      injector.clean();
       app.close(function() {
         completed = true;
         done();
@@ -103,7 +105,7 @@ laika = function(callback) {
 }
 
 process.on('exit', function() {
-  // console.log('  cleaning up injected code\n'.blue.bold);
-  // injector.clean();
+  console.log('  cleaning up injected code\n'.blue.bold);
+  injector.clean();
   phantom._phantom.kill();
 });
