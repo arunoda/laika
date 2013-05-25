@@ -3,7 +3,7 @@ layout: post
 title: Getting Started
 ---
 
-`Laika` is a testing framework **specially** build for meteor. Intention of the framework is **not** to do traditional unit testing but to do **end to end** testing, interacting with **both** server and client(s).
+`Laika` is a testing framework **specially** build for [meteor](http://meteor.js). Intention of the framework is **not** to do traditional unit testing but to do **end to end** testing, interacting with **both** server and client(s).
 
 ##Installation and Setup
 
