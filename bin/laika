@@ -9,22 +9,16 @@ var ServerConnector = require('../lib/connectors/server.js');
 var ClientConnector = require('../lib/connectors/client.js');
 var helpers = require('../lib/helpers');
 var qbox = require('qbox');
+var Mocha = require('mocha');
+var fs = require('fs');
+var path = require('path');
 
-// var injectPort = helpers.getRandomPort();
-// var injector = new Injector({injectPort: injectPort});
 var injectPort = helpers.getRandomPort();
 var notificationPort = helpers.getRandomPort();
-var injector = new Injector({
-  injectPort: injectPort,
-  notificationPort: notificationPort
-});
+var injector = new Injector();
 var deps = qbox.create(2);
 var phantom;
 var appPool;
-
-//add --recursive tests argvs
-process.argv.push('--recursive');
-process.argv.push('tests');
 
 console.info('\n  injecting laika...'.blue.bold);
 injector.inject();
@@ -48,12 +42,43 @@ deps.ready(function() {
 });
 
 function onAppPoolReady() {
-  require('mocha/bin/_mocha');
+  // require('mocha/bin/_mocha');
+  var mocha = new Mocha;
+  mocha.reporter('spec').ui('tdd');
+  
+  var testsPath = process.argv[2] || './tests';
+  identifyTests(testsPath, mocha);
+  var runner = mocha.run(atTheEnd);
 }
 
+function identifyTests(path, mocha) {
+  var stat = fs.statSync(path);
+  if(stat.isDirectory()) {
+    scanFiles(path, mocha, {});
+  } else {
+    mocha.addFile(path);
+  }
+}
 
-laika = function(callback) {
-  return function (done) {    
+function scanFiles(dir, mocha, options) {
+  options = options || {};
+  var files = fs.readdirSync(dir);
+
+  files.forEach(function(file) {
+    var filename = path.resolve(dir, file);
+    var stat = fs.statSync(filename);
+    if(stat.isDirectory()) {
+      scanFiles(filename, mocha, options);
+    } else {
+      mocha.addFile(filename);
+    }
+  });
+}
+
+ltest = lit = function(message, callback) {
+
+  this.test(message, mockTest);
+  function mockTest(done) {    
     var completed = false;
     var args = [];
 
@@ -102,9 +127,12 @@ laika = function(callback) {
   }
 }
 
-process.on('exit', function() {
+function atTheEnd() {
   console.log('  cleaning up injected code\n'.blue.bold);
   injector.clean();
   appPool.close();
   phantom._phantom.kill();
-});
+  setTimeout(function() {
+    process.exit(0);
+  }, 100);
+}
