@@ -16,7 +16,7 @@ suite('Injector', function() {
     injector.inject();
     var injectedServerCode = fs.readFileSync(path.resolve(folder, 'server', 'meteor-suite-server.js'), 'utf8');
     var injectedClientCode = fs.readFileSync(path.resolve(folder, 'client', 'meteor-suite-client.js'), 'utf8');
-    assert.ok(injectedServerCode.match(7007));
+    assert.ok(injectedServerCode.match('laika'));
     assert.ok(injectedClientCode.length > 0);
 
     injector.clean();
@@ -40,7 +40,7 @@ suite('Injector', function() {
 
     var injectedServerCode = fs.readFileSync(path.resolve(folder, 'server', 'meteor-suite-server.js'), 'utf8');
     var injectedClientCode = fs.readFileSync(path.resolve(folder, 'client', 'meteor-suite-client.js'), 'utf8');
-    assert.ok(injectedServerCode.match(7008));
+    assert.ok(injectedServerCode.match('laika'));
     assert.ok(injectedClientCode.length > 0);
 
     injector.clean();
@@ -51,7 +51,6 @@ suite('Injector', function() {
   test('injecting and cleaning', function(done) {
     var folder = path.resolve('/tmp', helpers.randomId(10));
     var injector = new Injector({
-      injectPort: 7007,
       appDir: folder
     });
     injector.inject();
@@ -66,40 +65,6 @@ suite('Injector', function() {
     });
 
     done();
-  });
-
-  test('getting ready event with the notification server', function(done) {
-    var injector = new Injector({
-      injectPort: 8001,
-      appDir: '/tmp',
-      notificationPort: 8002
-    });
-    injector.inject();
-
-    injector.on('ready', function() {
-      injector.clean();
-      done();
-    });
-    http.get('http://localhost:8002', function(res) {
-      assert.equal(res.statusCode, 200);
-    }).on('error', assert.ifError);
-  });
-
-  test('getting interrupted event with the notification server', function(done) {
-    var injector = new Injector({
-      injectPort: 8001,
-      appDir: '/tmp',
-      notificationPort: 8002
-    });
-    injector.inject();
-
-    injector.on('interrupted', function() {
-      injector.clean();
-      done();
-    });
-
-    http.get('http://localhost:8002').on('error', assert.ifError);
-    http.get('http://localhost:8002').on('error', assert.ifError);
   });
 })
 
