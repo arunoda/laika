@@ -1,4 +1,4 @@
-permalink: /:title.html
+permalink: :title.html
 exclude:
 - README.md
 - Rakefile
