@@ -1,0 +1,201 @@
+<html>
+<head>
+	
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<link rel="stylesheet" type="text/css" href="css/monokai.css">
+	<title>Laika - full featured testing framework for meteor</title>
+	<script type="text/javascript" src='/js/highlight.pack.js'></script>
+	<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+
+	<style type="text/css">
+
+
+	</style>
+</head>
+<body>
+
+	<div id='dokeeno-content'>
+
+		<div id='heading'>
+			<div id='logo'>
+				<a href='/'><h1>Laika</h1></a>
+				<a href='/' id='logo_docs'><h2>full featured testing framework for meteor</h2></a>
+			</div>
+			<div id='links'>
+			</div>
+			<div style='clear: both'></div>
+		</div>
+
+		<div id='content'>
+	
+			<div id='pageList'>
+				<ul>
+					
+						<li><a class='selected'href='/getting-started.html'>Getting Started</a></li>
+					
+				</ul>
+			</div>
+
+			<div id='page'>
+
+				<h1 id='page-title'>Getting Started</h1>
+				<div id='content'>
+					<p><code>Laika</code> is a testing framework <strong>specially</strong> build for meteor. Intention of the framework is <strong>not</strong> to do traditional unit testing but to do <strong>end to end</strong> testing, interacting with <strong>both</strong> server and client(s).</p>
+
+<h2 id='installation_and_setup'>Installation and Setup</h2>
+
+<p>First install <code>laika</code> from npm</p>
+
+<pre><code>sudo npm install -g laika</code></pre>
+
+<p>Download and install <a href='http://phantomjs.org/download.html'><code>phantomJS</code></a></p>
+
+<p>Install <code>meteor</code> if you use <code>meteorite</code>. You can still use meteorite(mrt) for the development. But laika needs meteor to do some magic.</p>
+
+<pre><code>curl https://install.meteor.com | /bin/sh</code></pre>
+
+<p>You need to start separate <code>mongodb</code> server with following options (It makes testing much speeder)</p>
+
+<pre><code>mongod --smallfiles --noprealloc --nojournal</code></pre>
+
+<h2 id='write_your_first_test_with_laika'>Write your first test with laika</h2>
+
+<p>Laika uses <code>tdd style</code> of testing for now. (we have some plans to allow other styles since we use <code>mocha</code> internally)</p>
+
+<p>You need to place you tests in <code>tests</code> folder in your meteor app. Files placed in the tests folder will not be included in your app.</p>
+
+<h3 id='our_simple_app'>Our simple app</h3>
+
+<p>Our simple meteor application has a collection shared in both the client and server</p>
+
+<pre><code>//collections.js
+Posts = new Meteor.Collection(&#39;posts&#39;);</code></pre>
+
+<h3 id='lets_write_our_first_test_well_test_our_collection_on_the_server'>Let&#8217;s write our first test. We&#8217;ll test our collection on the server</h3>
+
+<pre><code>//tests/posts.js
+var assert = require(&#39;assert&#39;);
+
+suite(&#39;Posts&#39;, function() {
+  ltest(&#39;in the server&#39;, function(done, server) {
+    server.eval(function() {
+      Posts.insert({title: &#39;hello title&#39;});
+      var docs = Posts.find().fetch();
+      emit(&#39;docs&#39;, docs);
+    });
+
+    server.once(&#39;docs&#39;, function(docs) {
+      assert.equal(docs.length, 1);
+      done();
+    });
+  });
+});</code></pre>
+
+<ul>
+<li>We have defined a <code>Posts</code> test suite</li>
+
+<li>Within that we&#8217;ve a test named &#8216;in the server&#8217;</li>
+
+<li>note that we&#8217;ve created our tests with <code>ltest()</code> method</li>
+
+<li>Then we evaluate some code block in the server</li>
+
+<li>Result will be send via an <code>emit</code></li>
+
+<li>Now we can listen to the event in tests</li>
+
+<li>You can think <code>server</code> as an event emitter between the server and the test</li>
+</ul>
+
+<p>Now let&#8217;s run our first. Simply apply following command</p>
+
+<pre><code>laika</code></pre>
+
+<p>You&#8217;ll see the output as below</p>
+
+<p><img alt='Firsr test result' src='/images/getting-started/one.png' /></p>
+
+<h3 id='lets_write_another_test_which_includes_both_client_and_the_server'>Lets write another test which includes both client and the server</h3>
+
+<p>this test also goes within the <code>Posts</code> suite</p>
+
+<pre><code>ltest(&#39;using both client and the server&#39;, function(done, server, client) {
+  server.eval(function() {
+    Posts.find().observe({
+      added: addedNewPost
+    });
+
+    function addedNewPost(post) {
+      emit(&#39;post&#39;, post);
+    }
+  }).once(&#39;post&#39;, function(post) {
+    assert.equal(post.title, &#39;hello title&#39;);
+    done();
+  });
+
+  client.eval(function() {
+    Posts.insert({title: &#39;hello title&#39;});
+  });
+});</code></pre>
+
+<ul>
+<li>Now we are observing a collection in the server</li>
+
+<li>Client do the insert and we&#8217;ll catch it</li>
+
+<li>You might have seen that our <code>server</code> object support method chaining as well :)</li>
+</ul>
+
+<p>lets see the result</p>
+
+<p><img alt='Second test result' src='/images/getting-started/two.png' /></p>
+
+<h3 id='lets_write_one_last_test_with_involving_two_clients'>Lets write one last test with involving two clients</h3>
+
+<pre><code>ltest(&#39;using two client&#39;, function(done, server, c1, c2) {
+  c1.eval(function() {
+    Posts.find().observe({
+      added: addedNewPost
+    });
+
+    function addedNewPost(post) {
+      emit(&#39;post&#39;, post);
+    }
+    emit(&#39;done&#39;);
+  }).once(&#39;post&#39;, function(post) {
+    assert.equal(post.title, &#39;from c2&#39;);
+    done();
+  }).once(&#39;done&#39;, function() {
+    c2.eval(insertPost);
+  });
+
+  function insertPost() {
+    Posts.insert({title: &#39;from c2&#39;});
+  }
+});</code></pre>
+
+<ul>
+<li>In this test we use two clients to observe changes in the Post collection</li>
+
+<li>You can create as many as clients by specifying arguments like above</li>
+</ul>
+
+<p>So the result is</p>
+
+<p><img alt='Third test result' src='/images/getting-started/third.png' /></p>
+				</div>
+			</div>
+			<div style='clear:both'></div>
+
+		</div>
+
+		<div id='footer'>
+			Laika - full featured testing framework for meteor<br>
+			created with love by<br>
+			<a href='http://arunoda.me'><code>Arunoda Susiripala</code></a>
+		</div>
+
+	</div>
+	<a href="https://github.com/arunoda/laika"><img style="box-shadow: 0 0px 0px; position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+</body>
+</html>
