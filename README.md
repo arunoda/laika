@@ -1,6 +1,6 @@
 laika
 =====
-Full Featured Test Suite for Meteor
+###Full Featured Test Suite for Meteor
 
 ![Laika Logo](http://arunoda.github.io/laika/images/logo.png)
 
