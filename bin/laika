@@ -4,6 +4,7 @@ var Phantom = require('node-phantom');
 var colors = require('colors');
 var Injector = require('../lib/injector');
 var App = require('../lib/app');
+var AppPool = require('../lib/app_pool');
 var ServerConnector = require('../lib/connectors/server.js');
 var ClientConnector = require('../lib/connectors/client.js');
 var helpers = require('../lib/helpers');
@@ -19,19 +20,11 @@ var injector = new Injector({
 });
 var deps = qbox.create(2);
 var phantom;
+var appPool;
 
 //add --recursive tests argvs
 process.argv.push('--recursive');
 process.argv.push('tests');
-
-deps.ready(function() {
-  require('mocha/bin/_mocha');
-});
-// injector.on('ready', deps.tick.bind(qbox));
-// injector.on('interrupted', function() {
-//   console.log('  tests interrupted with app reload!\n  do not update the app while test is running.'.red.bold);
-//   process.exit(1);
-// });
 
 console.info('\n  injecting laika...'.blue.bold);
 injector.inject();
@@ -45,9 +38,19 @@ Phantom.create(function(err, ph) {
   } else {
     phantom = ph;
     deps.tick();
-    // require('mocha/bin/_mocha');
   }
 });
+
+deps.ready(function() {
+  console.info('  loading initial app pool...'.blue.bold);
+  appPool = new AppPool({size: 4, appDir: './'});
+  appPool.on('ready', onAppPoolReady);
+});
+
+function onAppPoolReady() {
+  require('mocha/bin/_mocha');
+}
+
 
 laika = function(callback) {
   return function (done) {    
@@ -55,17 +58,12 @@ laika = function(callback) {
     var args = [];
 
     //create new server with different db and port
-    var appPort = helpers.getRandomPort();
-    var mongoDbname = helpers.randomId(10);
+    var app = appPool.get();
+    var appPort = app.port
+    var mongoDbname = app.dbname;
     var appUrl = "http://localhost:" + appPort;
 
-    injector.resetStatus();
-    var app = new App();
-    app.start(mongoDbname, appPort);
-
-    var d = Date.now();
-    injector.once('ready', function() {
-      console.log(Date.now() -d);
+    app.ready(function(injectPort) {
       if(callback.length == 0) {
         args = [];
       } else if(callback.length == 1) {
@@ -107,5 +105,6 @@ laika = function(callback) {
 process.on('exit', function() {
   console.log('  cleaning up injected code\n'.blue.bold);
   injector.clean();
+  appPool.close();
   phantom._phantom.kill();
 });
