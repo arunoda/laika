@@ -19,5 +19,10 @@
   },
   "scripts": {
     "test": "node_modules/.bin/mocha -u tdd -R spec -t 5000 --recursive test"
+  },
+  "author": "Arunoda Susiripala <arunoda.susiripala@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/arunoda/laika.git"
   }
 }
