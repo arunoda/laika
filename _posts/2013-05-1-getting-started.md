@@ -67,7 +67,7 @@ Now let's run our first. Simply apply following command
 
 You'll see the output as below
 
-![Firsr test result](/images/getting-started/one.png)
+![Firsr test result](images/getting-started/one.png)
 
 ### Lets write another test which includes both client and the server
 
@@ -98,7 +98,7 @@ this test also goes within the `Posts` suite
 
 lets see the result
 
-![Second test result](/images/getting-started/two.png)
+![Second test result](images/getting-started/two.png)
 
 ### Lets write one last test with involving two clients
 
@@ -129,5 +129,5 @@ lets see the result
 
 So the result is
 
-![Third test result](/images/getting-started/third.png)
+![Third test result](images/getting-started/third.png)
 
