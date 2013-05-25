@@ -28,7 +28,7 @@ Laika uses `tdd style` of testing for now. (we have some plans to allow other st
 You need to place you tests in `tests` folder in your meteor app. Files placed in the tests folder will not be included in your app.
 
 ### Our simple app
-Our simple meteor application has a collection shared in both the client and server
+Our simple meteor application has a collection shared in both the client and server. This sample app is available on [`github`](https://github.com/arunoda/hello-laika)
 
     //collections.js
     Posts = new Meteor.Collection('posts');
@@ -131,3 +131,4 @@ So the result is
 
 ![Third test result](images/getting-started/third.png)
 
+### [Checkout this sample app on github](https://github.com/arunoda/hello-laika)
