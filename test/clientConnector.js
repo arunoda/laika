@@ -5,6 +5,7 @@ var http = require('http');
 var Phantom = require('node-phantom');
 var helpers = require('../lib/helpers');
 var ClientConnector = require('../lib/connectors/client.js');
+var Fiber = require('fibers');
 
 var CLIENT_TEMPLATE_LOCATION = path.resolve(__dirname, '../lib/injector/templates/client.js');
 var clientCode = fs.readFileSync(CLIENT_TEMPLATE_LOCATION, 'utf8');
@@ -67,6 +68,25 @@ suite('ClientConnector', function() {
         cc.close();
         done();
       })
+    })
+  });
+
+  test('run in client and get result with .evalSync()', function(done) {
+    var port = helpers.getRandomPort();
+    var server = createHttpServer(port);
+    var cc;
+    getPhantom(function(phantom) {
+      Fiber(function() {
+        cc = new ClientConnector(phantom, 'http://localhost:' + port);
+        var result = cc.evalSync(function() {
+          emit('return', 10);
+        });
+
+        assert.equal(result, 10);
+        server.close();
+        cc.close();
+        done();
+      }).run();
     })
   });
 })

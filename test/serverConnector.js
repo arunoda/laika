@@ -5,6 +5,7 @@ var fs = require('fs');
 var handlebars = require('handlebars');
 var ServerConnector = require('../lib/connectors/server.js');
 var helpers = require('../lib/helpers');
+var Fiber = require('fibers');
 
 var SERVER_TEMPLATE_LOCATION = path.resolve(__dirname, '../lib/injector/templates/server.js');
 
@@ -80,6 +81,28 @@ suite('ServerConnector', function() {
         done();
       });
     }, 20);
+  });
+
+  test('run in server and get result with .evalSync()', function(done) {
+    var Npm = {require: require};
+    var template = handlebars.compile(fs.readFileSync(SERVER_TEMPLATE_LOCATION, 'utf8'));
+    var serverCode = template();
+    
+    eval(serverCode);
+    setTimeout(function() {
+      Fibers(runInFiber).run();
+    }, 20);
+
+    function runInFiber() {
+      //port variable comes from the serverCode
+      var sc = new ServerConnector(port);
+      var result = sc.evalSync(function() {
+        emit('return', 1001)
+      });
+      assert.equal(result, 1001);
+      sc.close();
+      done();
+    }
   });
 
 });

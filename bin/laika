@@ -12,6 +12,7 @@ var qbox = require('qbox');
 var Mocha = require('mocha');
 var fs = require('fs');
 var path = require('path');
+var Fiber = require('fibers');
 
 var injectPort = helpers.getRandomPort();
 var notificationPort = helpers.getRandomPort();
@@ -103,10 +104,12 @@ ltest = lit = function(message, callback) {
         }
       }
 
-      callback.apply(null, args);
-      if(args.length == 0) {
-        completeTest();
-      }
+      Fiber(function() {
+        callback.apply(null, args);
+        if(args.length == 0) {
+          completeTest();
+        }
+      }).run();
     });
 
     function cleanAndDone() {

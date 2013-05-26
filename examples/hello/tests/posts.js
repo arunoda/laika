@@ -58,4 +58,29 @@ suite('Posts', function() {
       Posts.insert({a: 10});
     });
   });
+
+  ltest('insert in client and observe in client too using evalSync()', function(done, server, c1, c2) {
+    var insertObject = { k: Math.random() };
+    c1.evalSync(function() {
+      Posts.find().observe({
+        added: onAdded
+      });
+
+      function onAdded(doc) {
+        emit('doc', doc);
+      }
+
+      emit('return');
+    });
+
+    c1.once('doc', function(doc) {
+      assert.equal(doc.k, insertObject.k);
+      done();
+    });
+
+    c2.eval(function(obj) {
+      Posts.insert(obj);
+    }, insertObject);
+
+  });
 });
