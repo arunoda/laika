@@ -4,7 +4,7 @@ title: Getting Started
 visible: true
 ---
 
-`Laika` is a testing framework **specially** build for [meteor](http://meteor.com). Intention of the framework is **not** to do traditional unit testing but to do **end to end** testing, interacting with **both** server and client(s).
+`Laika` is a full featured testing framework for [meteor](http://meteor.com). Intention of laika is **not** to do traditional unit testing but to do **end to end** testing, interacting with **both** server and client(s).
 
 ##Installation and Setup
 
@@ -14,22 +14,22 @@ visible: true
 
 * Download and install [`phantomJS`](http://phantomjs.org/download.html)
 
-* You need to start separate `mongodb` server with following options (It makes testing much speeder)
+* You need to start a separate `mongodb` server with following options (It makes testing much speeder)
 
     `mongod --smallfiles --noprealloc --nojournal`
-* We can use a [ramdisk](https://en.wikipedia.org/wiki/RAM_drive) as a mongodb data directory. It will make test run very faster. [See this guide](using-ram-disk.html)
+* You can also use a [ramdisk](https://en.wikipedia.org/wiki/RAM_drive) as the mongodb data directory. It makes your tests completed in 3X faster. [See this guide](using-ram-disk.html)
 
 > ### Special note for meteorite users
 > 
-> * You need to [install](http://docs.meteor.com/#quickstart) `meteor` if you have not done it (meteor binary should be avilable on the path)
+> * You need to [install](http://docs.meteor.com/#quickstart) `meteor` if you have not installed it (meteor binary should be avilable on the path)
 > * You need to install/update smart packages before running `laika`
 > * You need to apply `meteor update` once before starting any tests
 
 ##Write your first test with laika
 
-Laika uses `tdd style` of testing for now. (we have some plans to allow other styles since we use  `mocha` internally)
+Laika uses `tdd style` of testing for now. (we have some plans to allow other styles and reporters since we use `mocha` internally)
 
-You need to place you tests in `tests` folder in your meteor app. Files placed in the tests folder will not be included in your app.
+You need to place tests in `tests` folder in your meteor app. Files placed in the tests folder will not be included in your app.
 
 ### Our simple app
 Our simple meteor application has a collection shared in both the client and server. This sample app is available on [`github`](https://github.com/arunoda/hello-laika)
@@ -97,7 +97,7 @@ this test also goes within the `Posts` suite
     });
 
 * Now we are observing a collection in the server
-* Client do the insert and we'll catch it
+* Client do the insert and we'll catch it on the server
 * You might have seen that our `server` object support method chaining as well :)
 
 lets see the result
@@ -135,4 +135,4 @@ So the result is
 
 ![Third test result](images/getting-started/third.png)
 
-### [Checkout this sample app on github](https://github.com/arunoda/hello-laika)
+<a href="examples.html" style='font-size: 20px; font-weight: bold'>Checkout more examples</a>
