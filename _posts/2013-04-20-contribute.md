@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Contribute
+visible: true
 ---
 
 `laika` is created by [`arunoda`](https://github.com/arunoda) with using some of the greatest [open source projects](http://goo.gl/qDGgx).

@@ -30,7 +30,9 @@
 			<div id='pageList'>
 				<ul>
 					{% for p in site.posts %}
-						<li><a {% if p.title == site.posts[0].title %}class='selected'{% endif %}href='{{site.url}}{{p.url}}'>{{p.title}}</a></li>
+						{% if p.visible %}
+							<li><a {% if p.title == site.posts[0].title %}class='selected'{% endif %}href='{{site.url}}{{p.url}}'>{{p.title}}</a></li>
+						{% endif %}
 					{% endfor %}
 				</ul>
 			</div>
