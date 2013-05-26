@@ -27,6 +27,15 @@ pre code {
 	font-weight: normal;
 }
 
+blockquote {
+	background-color: #f1f6ff;
+	padding: 0px 10px 0px 10px;
+	margin: 0px;
+	border: 1px solid rgb(200, 200, 200);
+	border-radius: 5px;
+	box-shadow: 0 0px 10px #00aad4;
+}
+
 a {
 	text-decoration: none;
 	color: #00aad4;

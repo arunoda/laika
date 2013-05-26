@@ -3,7 +3,7 @@ layout: post
 title: Getting Started
 ---
 
-`Laika` is a testing framework **specially** build for [meteor](http://meteor.js). Intention of the framework is **not** to do traditional unit testing but to do **end to end** testing, interacting with **both** server and client(s).
+`Laika` is a testing framework **specially** build for [meteor](http://meteor.com). Intention of the framework is **not** to do traditional unit testing but to do **end to end** testing, interacting with **both** server and client(s).
 
 ##Installation and Setup
 
@@ -12,14 +12,18 @@ First install `laika` from npm
     sudo npm install -g laika
 
 Download and install [`phantomJS`](http://phantomjs.org/download.html)
-
-Install `meteor` if you use `meteorite`. You can still use meteorite(mrt) for the development. But laika needs meteor to do some magic.
     
     curl https://install.meteor.com | /bin/sh
 
 You need to start separate `mongodb` server with following options (It makes testing much speeder)
 
     mongod --smallfiles --noprealloc --nojournal
+
+> ### Special note for meteorite users
+> 
+> * You need to [install](http://docs.meteor.com/#quickstart) `meteor` if you have not done it (meteor binary should be avilable on the path)
+> * You need to install/update smart packages before running `laika`
+> * You need to apply `meteor update` once before starting any tests
 
 ##Write your first test with laika
 
