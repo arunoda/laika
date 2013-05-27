@@ -89,6 +89,33 @@ suite('ClientConnector', function() {
       }).run();
     })
   });
+
+  test('run in client with error', function(done) {
+    var port = helpers.getRandomPort();
+    var server = createHttpServer(port);
+    var cc;
+    getPhantom(function(phantom) {
+      cc = new ClientConnector(phantom, 'http://localhost:' + port);
+      cc.eval(function() {
+        throw new Error('dsdsd');
+        emit('result', 10);
+      });
+
+      cc.on('error', function(val) {
+        server.close();
+        cc.close();
+        done();
+      })
+
+      cc.on('result', function() {
+        assert.fail("cannot get the result");
+      });
+    })
+  });
+
+  test('**to kill phantom js**', function() {
+    phantom._phantom.kill();
+  });
 })
 
 function getPhantom(callback) {
