@@ -134,7 +134,7 @@ function atTheEnd() {
   console.log('  cleaning up injected code\n'.blue.bold);
   injector.clean();
   appPool.close();
-  phantom._phantom.kill();
+  phantom._phantom.kill('SIGKILL');
   setTimeout(function() {
     process.exit(0);
   }, 100);
