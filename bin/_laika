@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var Phantom = require('node-phantom');
 var colors = require('colors');
 var Injector = require('../lib/injector');
