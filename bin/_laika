@@ -38,6 +38,7 @@ deps.ready(function() {
   console.info('  loading initial app pool...'.blue.bold);
   appPool = new AppPool({size: 4, appDir: './'});
   appPool.on('ready', onAppPoolReady);
+  appPool.once('needExit', atTheEnd);
 });
 
 function onAppPoolReady() {

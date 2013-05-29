@@ -1,0 +1,25 @@
+{
+  "meteor": {
+    "git": "https://github.com/meteor/meteor.git",
+    "branch": "master",
+    "commit": "5d736d4bf0448c7db1f9b47124dfafc34a9631bb"
+  },
+  "dependencies": {
+    "basePackages": {
+      "spin": {},
+      "cluster": {}
+    },
+    "packages": {
+      "spin": {
+        "git": "https://github.com/SachaG/meteor-spin.git",
+        "tag": "v0.2.0",
+        "commit": "fd3a2871a69442848b4b4e74f5e1ae28fa4a95a4"
+      },
+      "cluster": {
+        "git": "https://github.com/arunoda/meteor-cluster.git",
+        "tag": "v0.1.4",
+        "commit": "64bde6c8fa016b64ba2f95285a301d2a9da36671"
+      }
+    }
+  }
+}
