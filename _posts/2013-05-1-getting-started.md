@@ -19,12 +19,6 @@ visible: true
     `mongod --smallfiles --noprealloc --nojournal`
 * You can also use a [ramdisk](https://en.wikipedia.org/wiki/RAM_drive) as the mongodb data directory. It makes your tests completed in 3X faster. [See this guide](using-ram-disk.html)
 
-> ### Special note for meteorite users
-> 
-> * You need to [install](http://docs.meteor.com/#quickstart) `meteor` if you have not installed it (meteor binary should be avilable on the path)
-> * You need to install/update smart packages before running `laika`
-> * You need to apply `meteor update` once before starting any tests
-
 ##Write your first test with laika
 
 Laika uses `tdd style` of testing for now. (we have some plans to allow other styles and reporters since we use `mocha` internally)
