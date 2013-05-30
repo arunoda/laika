@@ -1,6 +1,6 @@
 {
   "name": "laika",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "end to end testing framework for meteor",
   "dependencies": {
     "handlebars": "1.0.x",
