@@ -39,7 +39,7 @@ module.exports = {
 
     deps.ready(function() {
       console.info('  loading initial app pool...'.blue.bold);
-      appPool = new AppPool({size: 4, appDir: './', mongoPort: argv.mport});
+      appPool = new AppPool({size: 2, appDir: './', mongoPort: argv.mport});
       appPool.on('ready', onAppPoolReady);
       appPool.once('needExit', atTheEnd);
       ltest = lit = testLogic(appPool, phantom);
