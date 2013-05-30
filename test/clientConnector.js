@@ -31,6 +31,26 @@ suite('ClientConnector', function() {
     })
   });
 
+  test('paramters emitting correctly', function(done) {
+    var port = helpers.getRandomPort();
+    var server = createHttpServer(port);
+    var cc;
+    getPhantom(function(phantom) {
+      cc = new ClientConnector(phantom, 'http://localhost:' + port);
+      cc.eval(function() {
+        emit('result', 10);
+      });
+
+      cc.on('result', function(val, noSuchParam) {
+        assert.equal(val, 10);
+        assert.equal(noSuchParam, null);
+        server.close();
+        cc.close();
+        done();
+      })
+    })
+  });
+
   test('run in client and get result in async fashion', function(done) {
     var port = helpers.getRandomPort();
     var server = createHttpServer(port);
