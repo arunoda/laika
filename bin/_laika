@@ -44,7 +44,7 @@ deps.ready(function() {
 function onAppPoolReady() {
   // require('mocha/bin/_mocha');
   var mocha = new Mocha;
-  mocha.reporter('spec').ui('tdd');
+  mocha.reporter('spec').ui('tdd').timeout(2000);
   
   var testsPath = process.argv[2] || './tests';
   identifyTests(testsPath, mocha);
