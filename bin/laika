@@ -1,27 +1,38 @@
 #!/usr/bin/env node
 var optimist = require('optimist');
 var argv = optimist
-    .usage('\nLaika - end to end testing framework for meteor.\nUsage: $0 [options] [path filter]')
+  .usage('\nLaika - end to end testing framework for meteor.\nUsage: $0 [options] [path filter]')
 
-    .describe('mport', 'specify mongodb port')
-    .default('mport', 27017)
-    .alias('mport', 'm')
+  .describe('mport', 'specify mongodb port')
+  .default('mport', 27017)
+  .alias('mport', 'm')
 
-    .describe('ui', 'specify test user interfaces (tdd|bdd)')
-    .default('ui', 'tdd')
-    .alias('ui', 'u')
+  .describe('ui', 'specify test user interfaces (tdd|bdd)')
+  .default('ui', 'tdd')
+  .alias('ui', 'u')
 
-    .describe('reporter', 'specify reporter to use (support all mocha reporters)')
-    .default('reporter', 'spec')
-    .alias('reporter', 'R')
+  .describe('reporter', 'specify reporter to use (support all mocha reporters)')
+  .default('reporter', 'spec')
+  .alias('reporter', 'R')
 
-    .describe('help', 'show this help')
-    .alias('help', 'h')
+  .describe('timeout', 'test-case timeout in milliseconds')
+  .default('timeout', 2000)
+  .alias('timeout', 't')
 
-    .argv;
+  .describe('version', 'print version')
+  .alias('version', 'v')
+
+  .describe('help', 'show this help')
+  .alias('help', 'h')
+
+  .argv;
+
+laika = require('./_laika');
 
 if(argv.help) {
   optimist.showHelp();
+} else if(argv.v) {
+  laika.version();
 } else {
-  require('./_laika');
+  laika.run(argv);
 }
