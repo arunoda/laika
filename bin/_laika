@@ -97,7 +97,9 @@ module.exports = {
   version: function() {
     var packageJson = require('../package.json');
     console.log(packageJson.version);
-  }
+  },
+
+  actions: require('../lib/actions')
 };
 
 
