@@ -86,10 +86,11 @@ module.exports = {
       if(!ended) {
         console.log('  cleaning up injected code\n'.blue.bold);
         injector.clean();
-        appPool.close();
         phantom._phantom.kill('SIGKILL');
+        appPool.close(function() {
+          process.exit(0);
+        });
         ended = true;
-        process.exit(0);
       }
     }
   },
