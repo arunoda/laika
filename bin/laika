@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var optimist = require('optimist');
 var argv = optimist
-  .usage('\nLaika - end to end testing framework for meteor.\nUsage: $0 [options] [path filter]')
+  .usage('\nLaika - testing framework for meteor.\nUsage: $0 [options] [path filter]')
 
   .describe('mport', 'specify mongodb port')
   .default('mport', 27017)
