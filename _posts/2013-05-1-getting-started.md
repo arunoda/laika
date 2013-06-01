@@ -4,7 +4,7 @@ title: Getting Started
 visible: true
 ---
 
-`Laika` is an end to end testing framework for [meteor](http://meteor.com). With laika you can simply write test with interacting with **both** server and client(s).
+`Laika` is a feature rich testing framework for [meteor](http://meteor.com). With laika you can simply write test with interacting with **both** server and client(s).
 
 ##Installation and Setup
 
