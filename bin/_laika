@@ -20,6 +20,8 @@ var ended = false;
 
 module.exports = {
   run: function(argv) {
+    helpers.makeAssertFiberFriendly();
+    
     console.info('\n  injecting laika...'.blue.bold);
     injector.inject();
     App.touch(deps.tick.bind(deps), {mongoPort: argv.mport});
