@@ -45,7 +45,8 @@ module.exports = {
       appPool.on('ready', onAppPoolReady);
       appPool.once('needExit', atTheEnd);
       if(argv.ui == 'tdd') {
-        test = ltest = testLogic(appPool, phantom);
+        test = testLogic(appPool, phantom);
+        ltest = ltestWithWarning(test);
       } else if(argv.ui == 'bdd') {
         it = testLogic(appPool, phantom);
       }
@@ -109,4 +110,14 @@ module.exports = {
   actions: require('../lib/actions')
 };
 
+function ltestWithWarning(test) {
+  var warned = false;
+  return function() {
+    if(!warned) {
+      warned = true;
+      console.warn('\n  WARNING: '.red.bold + 'ltest'.white.bold + ' is deprecated, use '.red.bold + 'test'.white.bold + ' instead'.red.bold);
+    }
+    test.apply(this, arguments);
+  };
+}
 
