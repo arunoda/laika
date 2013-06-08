@@ -37,7 +37,7 @@ Our simple meteor application has a collection shared in both the client and ser
     var assert = require('assert');
 
     suite('Posts', function() {
-      ltest('in the server', function(done, server) {
+      test('in the server', function(done, server) {
         server.eval(function() {
           Posts.insert({title: 'hello title'});
           var docs = Posts.find().fetch();
@@ -53,7 +53,7 @@ Our simple meteor application has a collection shared in both the client and ser
 
 * We have defined a `Posts` test suite
 * Within that we've a test named 'in the server'
-* note that we've created our tests with `ltest()` method
+* note that we've created our tests with `test()` method
 * Then we evaluate some code block in the server
 * Result will be send via an `emit`
 * Now we can listen to the event in tests
@@ -71,7 +71,7 @@ You'll see the output as below
 
 this test also goes within the `Posts` suite
 
-    ltest('using both client and the server', function(done, server, client) {
+    test('using both client and the server', function(done, server, client) {
       server.eval(function() {
         Posts.find().observe({
           added: addedNewPost
@@ -100,7 +100,7 @@ lets see the result
 
 ### Lets write one last test with involving two clients
 
-    ltest('using two client', function(done, server, c1, c2) {
+    test('using two client', function(done, server, c1, c2) {
       c1.eval(function() {
         Posts.find().observe({
           added: addedNewPost

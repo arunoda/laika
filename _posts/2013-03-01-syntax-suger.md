@@ -16,7 +16,7 @@ See following example and you'll realize :)
 
 ### Normal way of writing your test
 
-    ltest('with with async style', function(done, server, client) {
+    test('with with async style', function(done, server, client) {
       server.eval(function() {
         setTimeout(function() {
           emit('result', {a: 10});
@@ -37,7 +37,7 @@ See following example and you'll realize :)
 
 ### With .evalSync() 
 
-    ltest('with .evalSync()', function(done, server, client) {
+    test('with .evalSync()', function(done, server, client) {
       var result = server.evalSync(function() {
         setTimeout(function() {
           emit('return', {a: 10});
@@ -60,7 +60,7 @@ If you want to send result(and the control) back to test, you must call `emit('r
 
 It is still possible to emit other events with `.evalSync()`, but they must be emitted after `return` event has been triggered. Otherwise those events will be ignored.
 
-    ltest('emitting other events', function(done, server, client) {
+    test('emitting other events', function(done, server, client) {
       var result = server.evalSync(function() {
         setTimeout(function() {
           emit('other-result', 20);
@@ -78,7 +78,7 @@ It is still possible to emit other events with `.evalSync()`, but they must be e
 
 Although `.evalSync()` is a powerful feature, you can't use it everywhere. It can be only use in the main test callback. If you try to use `.evalSync()` inside a nested callback function, it throws an error. See following example.
 
-    ltest('.evalSync() get failed', function(done, server, client) {
+    test('.evalSync() get failed', function(done, server, client) {
       server.eval(function() {
         setTimeout(function() {
           emit('result', 100);
