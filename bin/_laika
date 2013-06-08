@@ -44,7 +44,11 @@ module.exports = {
       appPool = new AppPool({size: 2, appDir: './', mongoPort: argv.mport});
       appPool.on('ready', onAppPoolReady);
       appPool.once('needExit', atTheEnd);
-      ltest = lit = testLogic(appPool, phantom);
+      if(argv.ui == 'tdd') {
+        test = ltest = testLogic(appPool, phantom);
+      } else if(argv.ui == 'bdd') {
+        it = testLogic(appPool, phantom);
+      }
     });
 
     function onAppPoolReady() {

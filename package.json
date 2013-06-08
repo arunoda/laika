@@ -5,7 +5,7 @@
   "dependencies": {
     "handlebars": "1.0.x",
     "mkdirp": "0.3.x",
-    "mocha": "1.x",
+    "mocha": "https://github.com/arunoda/mocha/archive/master.tar.gz",
     "node-phantom": "https://github.com/arunoda/node-phantom/archive/master.tar.gz",
     "colors": "0.6.x",
     "qbox": "0.1.x",
