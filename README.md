@@ -1,6 +1,6 @@
 laika [![Build Status](https://travis-ci.org/arunoda/laika.png?branch=master)](https://travis-ci.org/arunoda/laika)
 =====
-###end to end testing framework for meteor
+###testing framework for meteor
 
 ##[Documentation](http://arunoda.github.io/laika/)
 
