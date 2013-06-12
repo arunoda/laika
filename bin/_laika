@@ -21,13 +21,29 @@ var ended = false;
 module.exports = {
   run: function(argv) {
     helpers.makeAssertFiberFriendly();
-    
-    console.info('\n  injecting laika...'.blue.bold);
-    injector.inject();
-    App.touch(deps.tick.bind(deps), {mongoPort: argv.mport});
 
-    console.info('  loading phantomjs...'.blue.bold);
-    Phantom.create(afterPhantomCreated)
+    var mongoUrl = "mongodb://localhost:" + argv.mport;
+    helpers.checkForMongoDB(mongoUrl, function(connected, err) {
+      if(connected) {
+        initialize();
+      } else {
+        var errorMessage = '  MONGODB_ERROR: ' + err.message;
+        console.log(errorMessage.red.bold);
+        process.exit(1);
+      }
+    });
+    
+    function initialize() {
+      console.info('\n  injecting laika...'.blue.bold);
+      injector.inject();
+      App.touch(deps.tick.bind(deps), {mongoPort: argv.mport});
+
+      console.info('  loading phantomjs...'.blue.bold);
+      Phantom.create(afterPhantomCreated);
+
+      //make sure this get ended everytime
+      process.once('exit', atTheEnd);
+    }
 
     function afterPhantomCreated(err, ph) {
       if(err) {
@@ -85,9 +101,6 @@ module.exports = {
         }
       });
     }
-
-    //make sure this get ended everytime
-    process.once('exit', atTheEnd);
 
     function atTheEnd() {
       if(!ended) {
