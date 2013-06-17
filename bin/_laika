@@ -11,6 +11,7 @@ var qbox = require('qbox');
 var Mocha = require('mocha');
 var fs = require('fs');
 var path = require('path');
+var exec = require('child_process').exec;
 
 var injector = new Injector();
 var deps = qbox.create(2);
@@ -22,16 +23,24 @@ module.exports = {
   run: function(argv) {
     helpers.makeAssertFiberFriendly();
 
-    var mongoUrl = "mongodb://localhost:" + argv.mport;
-    helpers.checkForMongoDB(mongoUrl, function(connected, err) {
-      if(connected) {
-        initialize();
-      } else {
-        var errorMessage = '  MONGODB_ERROR: ' + err.message;
-        console.log(errorMessage.red.bold);
-        process.exit(1);
-      }
-    });
+    //laika drops dbs after the test without any problem
+    //if if you close laika with "CTRL + C" or laika got some internal error
+    //ther is possibility of having some leaked dbs
+    //this will ensure dropping them
+    dropLaikaDbs(checkMongoDB);
+
+    function checkMongoDB() {
+      var mongoUrl = "mongodb://localhost:" + argv.mport;
+      helpers.checkForMongoDB(mongoUrl, function(connected, err) {
+        if(connected) {
+          initialize();
+        } else {
+          var errorMessage = '  MONGODB_ERROR: ' + err.message;
+          console.log(errorMessage.red.bold);
+          process.exit(1);
+        }
+      });
+    }
     
     function initialize() {
       console.info('\n  injecting laika...'.blue.bold);
@@ -134,3 +143,13 @@ function ltestWithWarning(test) {
   };
 }
 
+function dropLaikaDbs(callback) {
+  //apply drop command with probability of 1/10
+  var dropThisTime = Math.ceil(Math.random() * 10) == 5;
+  if(dropThisTime) {
+    var scriptsFolder = path.resolve(__dirname, '../scripts');
+    exec('mongo drop-laika-dbs.js', {cwd: scriptsFolder}, callback);
+  } else {
+    callback();
+  }
+}
