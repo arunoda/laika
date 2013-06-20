@@ -51,7 +51,9 @@ module.exports = {
       Phantom.create(afterPhantomCreated);
 
       //make sure this get ended everytime
-      process.once('exit', atTheEnd);
+      process.once('exit', function() {
+        atTheEnd(1);
+      });
     }
 
     function afterPhantomCreated(err, ph) {
@@ -68,7 +70,9 @@ module.exports = {
       console.info('  loading initial app pool...'.blue.bold);
       appPool = new AppPool({size: 2, appDir: './', mongoPort: argv.mport});
       appPool.on('ready', onAppPoolReady);
-      appPool.once('needExit', atTheEnd);
+      appPool.once('needExit', function() {
+        atTheEnd(1);
+      });
       if(argv.ui == 'tdd') {
         test = testLogic(appPool, phantom);
         ltest = ltestWithWarning(test);
@@ -84,7 +88,10 @@ module.exports = {
       
       var testsPath = argv._[0] || './tests';
       identifyTests(testsPath, mocha);
-      var runner = mocha.run(atTheEnd);
+      var runner = mocha.run(function(failedCount) {
+        var exitCode = (failedCount > 0)? 1: 0;
+        atTheEnd(exitCode);
+      });
     }
 
     function identifyTests(path, mocha) {
@@ -111,13 +118,13 @@ module.exports = {
       });
     }
 
-    function atTheEnd() {
+    function atTheEnd(exitCode) {
       if(!ended) {
         console.log('  cleaning up injected code\n'.blue.bold);
         injector.clean();
         phantom._phantom.kill('SIGKILL');
         appPool.close(function() {
-          process.exit(0);
+          process.exit(exitCode);
         });
         ended = true;
       }
