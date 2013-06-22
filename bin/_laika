@@ -152,8 +152,8 @@ function ltestWithWarning(test) {
 
 function dropLaikaDbs(callback) {
   //apply drop command with probability of 1/10
-  var dropThisTime = Math.ceil(Math.random() * 10) == 5;
-  if(dropThisTime) {
+  // var dropThisTime = Math.ceil(Math.random() * 10) == 5;
+  if(true) {
     var scriptsFolder = path.resolve(__dirname, '../scripts');
     exec('mongo drop-laika-dbs.js', {cwd: scriptsFolder}, callback);
   } else {
