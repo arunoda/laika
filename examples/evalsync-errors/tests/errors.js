@@ -20,7 +20,7 @@ suite('EvalSync Error Catch', function() {
         throw new Error('hoiya');
         emit('return');
       }); 
-      assert.fail('should throw some error');
+      assert.fail('should throw an error');
     } catch(ex) {
       assert.ok(ex.message.match(/hoiya/));
       done();
