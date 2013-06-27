@@ -17,7 +17,7 @@ suite('EvalSync Expect Error', function() {
 
     test('throw error on evalSync', function(done, server, client) {
 
-      var error = server.evalSyncExpcectError('I want some error', function() {
+      var error = server.evalSyncExpectError('I want some error', function() {
         throw new Error('hoiya');
         emit('return');
       });
@@ -28,7 +28,7 @@ suite('EvalSync Expect Error', function() {
 
     test('evalSync Error expected but not thrown', function(done, server, client) {
 
-      server.evalSyncExpcectError('expected but not thrown', function() {
+      server.evalSyncExpectError('expected but not thrown', function() {
         // throw new Error('hoiya');
         emit('return');
       });
@@ -53,7 +53,7 @@ suite('EvalSync Expect Error', function() {
 
     test('throw error on evalSync', function(done, server, client) {
 
-      var error = client.evalSyncExpcectError('I want some error', function() {
+      var error = client.evalSyncExpectError('I want some error', function() {
         throw new Error('hoiya');
         emit('return');
       });
@@ -64,7 +64,7 @@ suite('EvalSync Expect Error', function() {
 
     test('evalSync Error expected but not thrown', function(done, server, client) {
 
-      server.evalSyncExpcectError('expected but not thrown', function() {
+      server.evalSyncExpectError('expected but not thrown', function() {
         // throw new Error('hoiya');
         emit('return');
       });
