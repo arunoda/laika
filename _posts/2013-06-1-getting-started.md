@@ -17,11 +17,10 @@ visible: true
 * You need to start a separate `mongodb` server with following options (It makes testing much speeder)
 
     `mongod --smallfiles --noprealloc --nojournal`
-* You can also use a [ramdisk](https://en.wikipedia.org/wiki/RAM_drive) as the mongodb data directory. It makes your tests completed in 3X faster. [See this guide](using-ram-disk.html)
 
 ##Write your first test with laika
 
-Laika uses `tdd style` of testing for now. (we have some plans to allow other styles and reporters since we use `mocha` internally)
+By default laika uses `tdd style` for the test. (you can change it to `bdd` as well. see: [laika options](options.html)
 
 You need to place tests in `tests` folder in your meteor app. Files placed in the tests folder will not be included in your app.
 
