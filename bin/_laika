@@ -7,6 +7,7 @@ var App = require('../lib/app');
 var AppPool = require('../lib/app_pool');
 var testLogic = require('../lib/test_logic');
 var helpers = require('../lib/helpers');
+var logger = require('../lib/logger');
 var qbox = require('qbox');
 var Mocha = require('mocha');
 var fs = require('fs');
@@ -35,19 +36,18 @@ module.exports = {
         if(connected) {
           initialize();
         } else {
-          var errorMessage = '  MONGODB_ERROR: ' + err.message;
-          console.log(errorMessage.red.bold);
+          logger.error('  MONGODB_ERROR: ' + err.message);
           process.exit(1);
         }
       });
     }
     
     function initialize() {
-      console.info('\n  injecting laika...'.blue.bold);
+      logger.info('\n  injecting laika...');
       injector.inject();
       App.touch(deps.tick.bind(deps), {mongoPort: argv.mport});
 
-      console.info('  loading phantomjs...'.blue.bold);
+      logger.info('  loading phantomjs...');
       Phantom.create(afterPhantomCreated);
 
       //make sure this get ended everytime
@@ -58,7 +58,7 @@ module.exports = {
 
     function afterPhantomCreated(err, ph) {
       if(err) {
-        console.log('  please install phantomjs to countinue'.red.bold);
+        logger.error('  please install phantomjs to countinue');
         throw err; 
       } else {
         phantom = ph;
@@ -67,7 +67,7 @@ module.exports = {
     }
 
     deps.ready(function() {
-      console.info('  loading initial app pool...'.blue.bold);
+      logger.info('  loading initial app pool...');
       appPool = new AppPool({size: 2, appDir: './', mongoPort: argv.mport});
       appPool.on('ready', onAppPoolReady);
       appPool.once('needExit', function() {
@@ -84,6 +84,10 @@ module.exports = {
     function onAppPoolReady() {
       // require('mocha/bin/_mocha');
       var mocha = new Mocha;
+      if(argv.debug) {
+        argv.reporter = 'tap';
+        logger.setVerbose(true);
+      }
       mocha.reporter(argv.reporter).ui(argv.ui).timeout(argv.timeout);
       
       var testsPath = argv._[0] || './tests';
@@ -120,7 +124,7 @@ module.exports = {
 
     function atTheEnd(exitCode) {
       if(!ended) {
-        console.log('  cleaning up injected code\n'.blue.bold);
+        logger.info('  cleaning up injected code\n');
         injector.clean();
         phantom._phantom.kill('SIGKILL');
         appPool.close(function() {
@@ -133,7 +137,7 @@ module.exports = {
 
   version: function() {
     var packageJson = require('../package.json');
-    console.log(packageJson.version);
+    logger.log(packageJson.version);
   },
 
   actions: require('../lib/actions')
@@ -144,7 +148,7 @@ function ltestWithWarning(test) {
   return function() {
     if(!warned) {
       warned = true;
-      console.warn('\n  WARNING: '.red.bold + 'ltest'.white.bold + ' is deprecated, use '.red.bold + 'test'.white.bold + ' instead'.red.bold);
+      logger.log('\n  WARNING: '.red.bold + 'ltest'.white.bold + ' is deprecated, use '.red.bold + 'test'.white.bold + ' instead'.red.bold);
     }
     test.apply(this, arguments);
   };

@@ -22,6 +22,10 @@ var argv = optimist
   .describe('version', 'print version')
   .alias('version', 'v')
 
+  .describe('debug', 'print logs from client/server')
+  .default('debug', false)
+  .alias('debug', 'd')
+
   .describe('help', 'show this help')
   .alias('help', 'h')
 
