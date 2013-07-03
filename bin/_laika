@@ -70,9 +70,7 @@ module.exports = {
       logger.info('  loading initial app pool...');
       appPool = new AppPool({size: 2, appDir: './', mongoPort: argv.mport});
       appPool.on('ready', onAppPoolReady);
-      appPool.once('needExit', function() {
-        atTheEnd(1);
-      });
+
       if(argv.ui == 'tdd') {
         test = testLogic(appPool, phantom);
         ltest = ltestWithWarning(test);
