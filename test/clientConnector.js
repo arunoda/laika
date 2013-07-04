@@ -52,6 +52,26 @@ suite('ClientConnector', function() {
     })
   });
 
+  test('getting a false value', function(done) {
+    var port = helpers.getRandomPort();
+    var server = createHttpServer(port);
+    var cc;
+    getPhantom(function(phantom) {
+      cc = new ClientConnector(phantom, 'http://localhost:' + port);
+      cc.eval(function() {
+        emit('result', false, 10);
+      });
+
+      cc.on('result', function(v1, v2) {
+        assert.equal(v1, false);
+        assert.equal(v2, 10);
+        server.close();
+        cc.close();
+        done();
+      })
+    })
+  });
+
   test('paramters emitting correctly', function(done) {
     var port = helpers.getRandomPort();
     var server = createHttpServer(port);
