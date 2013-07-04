@@ -22,11 +22,17 @@ var ended = false;
 
 module.exports = {
   run: function(argv) {
-    //adding addition support for the --debug
     if(argv.debug) {
+      //adding addition support for the --debug
       argv.reporter = 'tap';
       logger.setVerbose(true);
+    } else if(argv['deep-debug']) {
+      //adding addition support for the --deep-debug
+      argv.reporter = 'tap';
+      logger.setVerbose(true);
+      logger.setDeepVerbose(true);
     }
+
     helpers.makeAssertFiberFriendly();
 
     //laika drops dbs after the test without any problem

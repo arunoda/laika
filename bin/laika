@@ -26,6 +26,10 @@ var argv = optimist
   .default('debug', false)
   .alias('debug', 'd')
 
+  .describe('deep-debug', 'print more debug logs')
+  .default('deep-debug', false)
+  .alias('deep-debug', 'D')
+
   .describe('help', 'show this help')
   .alias('help', 'h')
 
