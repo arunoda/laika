@@ -22,6 +22,11 @@ var ended = false;
 
 module.exports = {
   run: function(argv) {
+    //adding addition support for the --debug
+    if(argv.debug) {
+      argv.reporter = 'tap';
+      logger.setVerbose(true);
+    }
     helpers.makeAssertFiberFriendly();
 
     //laika drops dbs after the test without any problem
@@ -82,10 +87,6 @@ module.exports = {
     function onAppPoolReady() {
       // require('mocha/bin/_mocha');
       var mocha = new Mocha;
-      if(argv.debug) {
-        argv.reporter = 'tap';
-        logger.setVerbose(true);
-      }
       mocha.reporter(argv.reporter).ui(argv.ui).timeout(argv.timeout);
       
       var testsPath = argv._[0] || './tests';
