@@ -98,21 +98,14 @@ module.exports = {
       mocha.reporter(argv.reporter).ui(argv.ui).timeout(argv.timeout);
       
       var testsPath = argv._[0] || './tests';
-      identifyTests(testsPath, mocha);
+      scanFiles(testsPath, mocha);
       var runner = mocha.run(function(failedCount) {
         var exitCode = (failedCount > 0)? 1: 0;
         atTheEnd(exitCode);
       });
     }
 
-    function identifyTests(path, mocha) {
-      var stat = fs.statSync(path);
-      if(stat.isDirectory()) {
-        scanFiles(path, mocha, {});
-      } else {
-        mocha.addFile(path);
-      }
-    }
+    var re = new RegExp('\\.js$');
 
     function scanFiles(dir, mocha, options) {
       options = options || {};
@@ -122,10 +115,12 @@ module.exports = {
         var filename = path.resolve(dir, file);
         var stat = fs.statSync(filename);
         if(stat.isDirectory()) {
-          scanFiles(filename, mocha, options);
-        } else {
-          mocha.addFile(filename);
+          return scanFiles(filename, mocha, options);
         }
+        if (!stat.isFile() || !re.test(filename) || path.basename(filename)[0] == '.') {
+          return;
+        }
+        mocha.addFile(filename);
       });
     }
 
