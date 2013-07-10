@@ -94,9 +94,23 @@ module.exports = {
 
     function onAppPoolReady() {
       // require('mocha/bin/_mocha');
-      var mocha = new Mocha;
-      mocha.reporter(argv.reporter).ui(argv.ui).timeout(argv.timeout);
-      
+      var mochaOptions= {
+          reporter: argv.reporter,
+          ui: argv.ui,
+          timeout: argv.timeout
+      };
+      if(typeof argv.compilers != "undefined"){
+          argv.compilers.split(',').forEach(function(c) {
+              var compiler = c.split(':')
+                  , mod = compiler[1];
+                      
+              if (mod[0] == '.') mod = join(process.cwd(), mod);
+              logger.laika('Adding compiler module: ' + mod);
+              require(mod);
+          });
+      }
+
+      var mocha = new Mocha(mochaOptions);
       var testsPath = argv._[0] || './tests';
       identifyTests(testsPath, mocha);
       var runner = mocha.run(function(failedCount) {
@@ -113,8 +127,22 @@ module.exports = {
         mocha.addFile(path);
       }
     }
-
-    var allowOnlyJsFiles = new RegExp('\\.js$');
+    
+    var allowOnlyProperSourceFiles, fileExtensions, compilers, i;
+    fileExtensions = '(js';
+    if(typeof argv.compilers !== "undefined"){
+        compilers = argv.compilers.split(',');
+        for(i = 0; i < compilers.length; i++){
+            //unless last element append pipe
+            if(i + 1 == compilers.length){
+                fileExtensions += '|';
+            }
+            fileExtensions += compilers[i].split(':')[0];
+        }
+    }
+    fileExtensions += ')';
+    logger.laika('Accepting the following extensions: ' + fileExtensions);
+    allowOnlyProperSourceFiles = new RegExp('\\.'+fileExtensions+'$');
 
     function scanFiles(dir, mocha, options) {
       options = options || {};
@@ -126,9 +154,10 @@ module.exports = {
         if(stat.isDirectory()) {
           return scanFiles(filename, mocha, options);
         }
-        if (!stat.isFile() || !allowOnlyJsFiles.test(filename) || path.basename(filename)[0] == '.') {
+        if (!stat.isFile() || !allowOnlyProperSourceFiles.test(filename) || path.basename(filename)[0] == '.') {
           return;
         }
+        logger.laika('Adding test file: ' + filename);
         mocha.addFile(filename);
       });
     }
