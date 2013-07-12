@@ -11,9 +11,6 @@ var argv = optimist
   .default('ui', 'tdd')
   .alias('ui', 'u')
 
-  .describe('compilers', 'CoffeeScript and similar transpilers may be used by mapping the file extensions and the module name. For example --compilers coffee:coffee-script')
-  .alias('compilers','c')
-
   .describe('reporter', 'specify reporter to use (support all mocha reporters)')
   .default('reporter', 'spec')
   .alias('reporter', 'R')
@@ -21,6 +18,9 @@ var argv = optimist
   .describe('timeout', 'test-case timeout in milliseconds')
   .default('timeout', 2000)
   .alias('timeout', 't')
+
+  .describe('compilers', '<ext>:<module>,...  use the given module(s) to compile files')
+  .alias('compilers','c')
 
   .describe('version', 'print version')
   .alias('version', 'v')
