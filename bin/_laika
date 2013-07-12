@@ -33,6 +33,9 @@ module.exports = {
       logger.setDeepVerbose(true);
     }
 
+    var compilers = parseCompilers(argv.compilers);
+    var isSourceFileAllowed = generateIsSourceFileAllowed(compilers);
+
     helpers.makeAssertFiberFriendly();
 
     //laika drops dbs after the test without any problem
@@ -99,15 +102,13 @@ module.exports = {
           ui: argv.ui,
           timeout: argv.timeout
       };
-      if(typeof argv.compilers != "undefined"){
-          argv.compilers.split(',').forEach(function(c) {
-              var compiler = c.split(':')
-                  , mod = compiler[1];
-                      
-              if (mod[0] == '.') mod = join(process.cwd(), mod);
-              logger.laika('Adding compiler module: ' + mod);
-              require(mod);
-          });
+
+      //requring compiler modules
+      if(compilers) {
+        compilers.modules.forEach(function(module) {
+          logger.laika('adding compiler module: ' + module);
+          require(module);
+        });
       }
 
       var mocha = new Mocha(mochaOptions);
@@ -127,22 +128,6 @@ module.exports = {
         mocha.addFile(path);
       }
     }
-    
-    var allowOnlyProperSourceFiles, fileExtensions, compilers, i;
-    fileExtensions = '(js';
-    if(typeof argv.compilers !== "undefined"){
-        compilers = argv.compilers.split(',');
-        for(i = 0; i < compilers.length; i++){
-            //unless last element append pipe
-            if(i + 1 == compilers.length){
-                fileExtensions += '|';
-            }
-            fileExtensions += compilers[i].split(':')[0];
-        }
-    }
-    fileExtensions += ')';
-    logger.laika('Accepting the following extensions: ' + fileExtensions);
-    allowOnlyProperSourceFiles = new RegExp('\\.'+fileExtensions+'$');
 
     function scanFiles(dir, mocha, options) {
       options = options || {};
@@ -154,10 +139,10 @@ module.exports = {
         if(stat.isDirectory()) {
           return scanFiles(filename, mocha, options);
         }
-        if (!stat.isFile() || !allowOnlyProperSourceFiles.test(filename) || path.basename(filename)[0] == '.') {
+        if (!stat.isFile() || !isSourceFileAllowed(filename) || path.basename(filename)[0] == '.') {
           return;
         }
-        logger.laika('Adding test file: ' + filename);
+        logger.laika('adding test file: ' + filename);
         mocha.addFile(filename);
       });
     }
@@ -210,5 +195,42 @@ function dropLaikaDbs(callback) {
     exec('mongo drop-laika-dbs.js', {cwd: scriptsFolder}, callback);
   } else {
     callback();
+  }
+}
+
+function parseCompilers(compilers) {
+  if(!compilers) return null;
+
+  var map = {};
+  var extensions = [];
+  var modules = [];
+
+  compilers.split(',').forEach(function(c) {
+      var compiler = c.split(':');
+      var extension = compiler[0];
+      var module = compiler[1];
+      map[extension] = module;
+      extensions.push(extension);
+      modules.push(module);
+  });
+
+  return {
+    map: map,
+    extensions: extensions,
+    modules: modules
+  };
+}
+
+function generateIsSourceFileAllowed(compilers) {
+  var fileExtensions = ['js'];
+  if(compilers) {
+    fileExtensions = fileExtensions.concat(compilers.extensions);
+  }
+  var fileExtensionsList = '(' + fileExtensions.join('|') + ')';
+  logger.laika('accepting the following extensions: ' + fileExtensionsList);
+  var allowOnlyProperSourceFiles = new RegExp('\\.'+fileExtensionsList+'$');
+
+  return function(filename) {
+    return allowOnlyProperSourceFiles.test(filename); 
   }
 }
