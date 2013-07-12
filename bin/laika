@@ -11,6 +11,9 @@ var argv = optimist
   .default('ui', 'tdd')
   .alias('ui', 'u')
 
+  .describe('compilers', 'CoffeeScript and similar transpilers may be used by mapping the file extensions and the module name. For example --compilers coffee:coffee-script')
+  .alias('compilers','c')
+
   .describe('reporter', 'specify reporter to use (support all mocha reporters)')
   .default('reporter', 'spec')
   .alias('reporter', 'R')

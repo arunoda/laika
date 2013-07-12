@@ -33,6 +33,9 @@ module.exports = {
       logger.setDeepVerbose(true);
     }
 
+    var compilers = parseCompilers(argv.compilers);
+    var isSourceFileAllowed = generateIsSourceFileAllowed(compilers);
+
     helpers.makeAssertFiberFriendly();
 
     //laika drops dbs after the test without any problem
@@ -94,9 +97,21 @@ module.exports = {
 
     function onAppPoolReady() {
       // require('mocha/bin/_mocha');
-      var mocha = new Mocha;
-      mocha.reporter(argv.reporter).ui(argv.ui).timeout(argv.timeout);
-      
+      var mochaOptions= {
+          reporter: argv.reporter,
+          ui: argv.ui,
+          timeout: argv.timeout
+      };
+
+      //requring compiler modules
+      if(compilers) {
+        compilers.modules.forEach(function(module) {
+          logger.laika('adding compiler module: ' + module);
+          require(module);
+        });
+      }
+
+      var mocha = new Mocha(mochaOptions);
       var testsPath = argv._[0] || './tests';
       identifyTests(testsPath, mocha);
       var runner = mocha.run(function(failedCount) {
@@ -114,8 +129,6 @@ module.exports = {
       }
     }
 
-    var allowOnlyJsFiles = new RegExp('\\.js$');
-
     function scanFiles(dir, mocha, options) {
       options = options || {};
       var files = fs.readdirSync(dir);
@@ -126,9 +139,10 @@ module.exports = {
         if(stat.isDirectory()) {
           return scanFiles(filename, mocha, options);
         }
-        if (!stat.isFile() || !allowOnlyJsFiles.test(filename) || path.basename(filename)[0] == '.') {
+        if (!stat.isFile() || !isSourceFileAllowed(filename) || path.basename(filename)[0] == '.') {
           return;
         }
+        logger.laika('adding test file: ' + filename);
         mocha.addFile(filename);
       });
     }
@@ -181,5 +195,42 @@ function dropLaikaDbs(callback) {
     exec('mongo drop-laika-dbs.js', {cwd: scriptsFolder}, callback);
   } else {
     callback();
+  }
+}
+
+function parseCompilers(compilers) {
+  if(!compilers) return null;
+
+  var map = {};
+  var extensions = [];
+  var modules = [];
+
+  compilers.split(',').forEach(function(c) {
+      var compiler = c.split(':');
+      var extension = compiler[0];
+      var module = compiler[1];
+      map[extension] = module;
+      extensions.push(extension);
+      modules.push(module);
+  });
+
+  return {
+    map: map,
+    extensions: extensions,
+    modules: modules
+  };
+}
+
+function generateIsSourceFileAllowed(compilers) {
+  var fileExtensions = ['js'];
+  if(compilers) {
+    fileExtensions = fileExtensions.concat(compilers.extensions);
+  }
+  var fileExtensionsList = '(' + fileExtensions.join('|') + ')';
+  logger.laika('accepting the following extensions: ' + fileExtensionsList);
+  var allowOnlyProperSourceFiles = new RegExp('\\.'+fileExtensionsList+'$');
+
+  return function(filename) {
+    return allowOnlyProperSourceFiles.test(filename); 
   }
 }
