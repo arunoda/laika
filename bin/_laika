@@ -62,7 +62,9 @@ module.exports = {
       App.touch(deps.tick.bind(deps), {mongoPort: argv.mport});
 
       logger.info('  loading phantomjs...');
-      Phantom.create(afterPhantomCreated);
+      Phantom.create(afterPhantomCreated, {parameters: {
+        'load-images': false
+      }});
 
       //make sure this get ended everytime
       process.once('exit', function() {
