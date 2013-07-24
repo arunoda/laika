@@ -174,6 +174,31 @@ suite('ClientConnector', function() {
     })
   });
 
+  test('run in client with simulating error (ignore them)', function(done) {
+    var port = helpers.getRandomPort();
+    var server = createHttpServer(port);
+    var cc;
+    getPhantom(function(phantom) {
+      cc = new ClientConnector(phantom, 'http://localhost:' + port);
+      cc.eval(function() {
+        throw new Error('simulating the effect dsdsd');
+        emit('result', 10);
+      });
+
+      cc.on('error', function(val) {
+        assert.fail('simulating errors should not cause any harm');
+      })
+
+      cc.on('result', function() {
+        assert.fail("cannot get the result");
+      });
+
+      setTimeout(function() {
+        done();
+      }, 50);
+    })
+  });
+
   test('**to kill phantom js**', function() {
     phantom._phantom.kill();
   });
