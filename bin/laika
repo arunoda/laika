@@ -1,8 +1,6 @@
 #!/usr/bin/env node
-var fs = require('fs');
 var optimist = require('optimist');
-
-var optionsParser = optimist
+var argv = optimist
   .usage('\nLaika - testing framework for meteor.\nUsage: $0 [options] [path filter]')
 
   .describe('mport', 'specify mongodb port')
@@ -36,11 +34,9 @@ var optionsParser = optimist
   .alias('deep-debug', 'D')
 
   .describe('help', 'show this help')
-  .alias('help', 'h');
+  .alias('help', 'h')
 
-setDefaultsFromOptsFile(optionsParser, 'laika.opts');
-
-var argv = optionsParser.argv;
+  .argv;
 
 laika = require('./_laika');
 
@@ -50,21 +46,4 @@ if(argv.help) {
   laika.version();
 } else {
   laika.run(argv);
-}
-
-function setDefaultsFromOptsFile(optionsParser, filePath) {
-  var optsFileArgs = parseOptsFile(filePath);
-  var fileOpts = optimist.parse(optsFileArgs);
-  return optionsParser.default(fileOpts);
-}
-
-function parseOptsFile(filePath) {
-  var opts = [];
-  if (fs.existsSync(filePath)) {
-    var fileValues = fs.readFileSync(filePath, 'utf8')
-      .trim()
-      .split(/[\s=]+/);
-    opts = opts.concat(fileValues);
-  }
-  return opts;
 }
