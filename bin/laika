@@ -40,7 +40,7 @@ var optionsParser = optimist
 
 setDefaultsFromOptsFile(optionsParser, 'laika.opts');
 
-var argv = optionsParser.argv;
+var argv = optionsParser.parse(process.argv.slice(2));
 
 laika = require('./_laika');
 
