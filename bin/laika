@@ -1,49 +1,36 @@
 #!/usr/bin/env node
-var optimist = require('optimist');
-var argv = optimist
-  .usage('\nLaika - testing framework for meteor.\nUsage: $0 [options] [path filter]')
-
-  .describe('mport', 'specify mongodb port')
-  .default('mport', 27017)
-  .alias('mport', 'm')
-
-  .describe('ui', 'specify test user interfaces (tdd|bdd)')
-  .default('ui', 'tdd')
-  .alias('ui', 'u')
-
-  .describe('reporter', 'specify reporter to use (support all mocha reporters)')
-  .default('reporter', 'spec')
-  .alias('reporter', 'R')
-
-  .describe('timeout', 'test-case timeout in milliseconds')
-  .default('timeout', 2000)
-  .alias('timeout', 't')
-
-  .describe('compilers', '<ext>:<module>,...  use the given module(s) to compile files')
-  .alias('compilers','c')
-
-  .describe('version', 'print version')
-  .alias('version', 'v')
-
-  .describe('debug', 'print logs from client/server')
-  .default('debug', false)
-  .alias('debug', 'd')
-
-  .describe('deep-debug', 'print more debug logs')
-  .default('deep-debug', false)
-  .alias('deep-debug', 'D')
-
-  .describe('help', 'show this help')
-  .alias('help', 'h')
-
-  .argv;
+var fs = require('fs');
+var commander = require('commander');
 
 laika = require('./_laika');
 
-if(argv.help) {
-  optimist.showHelp();
-} else if(argv.v) {
-  laika.version();
-} else {
-  laika.run(argv);
+var optionsParser = commander
+  .usage('\nLaika - testing framework for meteor.\nUsage: $0 [options] [path filter]')
+  .version(laika.version())
+  .option('-m, --mport <port>', 'specify mongodb port [default: 27017]', 27017)
+  .option('-u, --ui <tdd|bdd>', 'specify test user interfaces (tdd|bdd) [default: tdd]', 'tdd')
+  .option('-R, --reporter <mocha_reporter>', 'specify reporter to use (support all mocha reporters) [default: spec]', 'spec')
+  .option('-t, --timeout <ms>', 'test-case timeout in milliseconds [default: 2000]', 2000)
+  .option('-c, --compilers <ext:module>', 'use the given module(s) to compile files')
+  .option('-d, --debug', 'print logs from client/server', false)
+  .option('-D, --deep-debug', 'print more debug logs', false);
+
+process.argv = parseOptsFile('laika.opts', process.argv);
+var argv = optionsParser.parse(process.argv);
+
+laika.run(argv);
+
+function parseOptsFile(filePath, argv) {
+  newArgv = argv;
+  if (fs.existsSync(filePath)) {
+    var opts = fs.readFileSync(filePath, 'utf8')
+      .trim()
+      .split(/\s+/)
+      .filter(function(el){ return el !== ''; });
+
+    newArgv = argv
+      .slice(0, 2)
+      .concat(opts.concat(process.argv.slice(2)));
+  }
+  return newArgv;
 }
