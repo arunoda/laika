@@ -168,7 +168,7 @@ module.exports = {
 
   version: function() {
     var packageJson = require('../package.json');
-    logger.log(packageJson.version);
+    return packageJson.version;
   },
 
   actions: require('../lib/actions')
