@@ -55,7 +55,7 @@ module.exports = {
         }
       });
     }
-    
+
     function initialize() {
       logger.info('\n  injecting laika...');
       injector.inject();
@@ -75,7 +75,7 @@ module.exports = {
     function afterPhantomCreated(err, ph) {
       if(err) {
         logger.error('  please install phantomjs to countinue');
-        throw err; 
+        throw err;
       } else {
         phantom = ph;
         phantom._phantom.stdout.on('data', onPhantomLogs);
@@ -114,7 +114,7 @@ module.exports = {
       }
 
       var mocha = new Mocha(mochaOptions);
-      var testsPath = argv._[0] || './tests';
+      var testsPath = argv.args[0] || './tests';
       identifyTests(testsPath, mocha);
       var runner = mocha.run(function(failedCount) {
         var exitCode = (failedCount > 0)? 1: 0;
@@ -233,6 +233,6 @@ function generateIsSourceFileAllowed(compilers) {
   var allowOnlyProperSourceFiles = new RegExp('\\.'+fileExtensionsList+'$');
 
   return function(filename) {
-    return allowOnlyProperSourceFiles.test(filename); 
+    return allowOnlyProperSourceFiles.test(filename);
   }
 }
