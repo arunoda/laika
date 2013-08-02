@@ -108,6 +108,10 @@ h1 {
 	
 }
 
+#content img {
+	width: 100%;
+}
+
 #footer {
 	margin: 30px 0px 0px 0px;
 	padding: 10px 0px 10px 0px;
