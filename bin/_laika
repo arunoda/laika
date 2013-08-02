@@ -26,7 +26,7 @@ module.exports = {
       //adding addition support for the --debug
       argv.reporter = 'tap';
       logger.setVerbose(true);
-    } else if(argv['deep-debug']) {
+    } else if(argv.deepDebug) {
       //adding addition support for the --deep-debug
       argv.reporter = 'tap';
       logger.setVerbose(true);

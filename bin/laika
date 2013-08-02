@@ -5,15 +5,16 @@ var commander = require('commander');
 laika = require('./_laika');
 
 var optionsParser = commander
-  .usage('\nLaika - testing framework for meteor.\nUsage: $0 [options] [path filter]')
+  .usage('[options] [path filter]')
   .version(laika.version())
   .option('-m, --mport <port>', 'specify mongodb port [default: 27017]', 27017)
   .option('-u, --ui <tdd|bdd>', 'specify test user interfaces (tdd|bdd) [default: tdd]', 'tdd')
-  .option('-R, --reporter <mocha_reporter>', 'specify reporter to use (support all mocha reporters) [default: spec]', 'spec')
+  .option('-R, --reporter <reporter>', 'specify reporter to use (support all mocha reporters) [default: spec]', 'spec')
   .option('-t, --timeout <ms>', 'test-case timeout in milliseconds [default: 2000]', 2000)
   .option('-c, --compilers <ext:module>', 'use the given module(s) to compile files')
   .option('-d, --debug', 'print logs from client/server', false)
-  .option('-D, --deep-debug', 'print more debug logs', false);
+  .option('-D, --deep-debug', 'print more debug logs', false)
+  .option('-v, --version', 'print version', false);
 
 process.argv = parseOptsFile('laika.opts', process.argv);
 var argv = optionsParser.parse(process.argv);
