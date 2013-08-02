@@ -26,7 +26,7 @@ module.exports = {
       //adding addition support for the --debug
       argv.reporter = 'tap';
       logger.setVerbose(true);
-    } else if(argv['deep-debug']) {
+    } else if(argv.deepDebug) {
       //adding addition support for the --deep-debug
       argv.reporter = 'tap';
       logger.setVerbose(true);
@@ -55,7 +55,7 @@ module.exports = {
         }
       });
     }
-    
+
     function initialize() {
       logger.info('\n  injecting laika...');
       injector.inject();
@@ -75,7 +75,7 @@ module.exports = {
     function afterPhantomCreated(err, ph) {
       if(err) {
         logger.error('  please install phantomjs to countinue');
-        throw err; 
+        throw err;
       } else {
         phantom = ph;
         phantom._phantom.stdout.on('data', onPhantomLogs);
@@ -114,7 +114,7 @@ module.exports = {
       }
 
       var mocha = new Mocha(mochaOptions);
-      var testsPath = argv._[0] || './tests';
+      var testsPath = argv.args[0] || './tests';
       identifyTests(testsPath, mocha);
       var runner = mocha.run(function(failedCount) {
         var exitCode = (failedCount > 0)? 1: 0;
@@ -168,7 +168,7 @@ module.exports = {
 
   version: function() {
     var packageJson = require('../package.json');
-    logger.log(packageJson.version);
+    return packageJson.version;
   },
 
   actions: require('../lib/actions')
@@ -233,6 +233,6 @@ function generateIsSourceFileAllowed(compilers) {
   var allowOnlyProperSourceFiles = new RegExp('\\.'+fileExtensionsList+'$');
 
   return function(filename) {
-    return allowOnlyProperSourceFiles.test(filename); 
+    return allowOnlyProperSourceFiles.test(filename);
   }
 }
