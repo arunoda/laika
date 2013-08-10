@@ -38,14 +38,13 @@ Replace test commands with following
 
 ## For others
 
-There are lots of other Continuous Integration services and downloaded servers out there. It is not feasible to provide how-to guides for all. Let's discuss in general how we can add laika support for them.
+There are lots of other Continuous Integration services and downloaded servers out there. It is not feasible to provide how-to guides for all. Let's discuss in general how to add laika support for them.
 
-All of these tools and services provide a way to customize their runtime and the test. Most of the time we can configure them using shell scripts. We can categorize them into two.
+All of these tools and services provide a way to customize their runtime and the test. Most of the time we can configure them using shell scripts. We can categorize them into two. Tools which:
+* Give configuration scripts ROOT access.
+* Don't give configuration scripts ROOT access.
 
-* Who gives ROOT access for configuration scripts
-* Who don't give us ROOT access for configuration scripts
-
-Laika can be configure for both very easily. Let's look at how.
+Laika can be configured for both very easily. Let's look at how.
 
 > * Assume you've configured or installed `nodejs`
 > * Assume there is a local mongodb server is running
