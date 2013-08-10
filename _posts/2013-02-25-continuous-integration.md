@@ -74,4 +74,4 @@ Laika can be configure for both very easily. Let's look at how.
     #run tests
     METEOR_PATH=~/meteor laika -t 5000
 
-I hope with this information, you could setup your meteor app for Continuous Integration  very easily. Let me know how you think about this, share your experiences.
+I hope with this information, you could setup your meteor app for Continuous Integration very easily. Let me know how you think about this, share your experiences.
