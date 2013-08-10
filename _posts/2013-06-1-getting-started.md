@@ -4,7 +4,7 @@ title: Getting Started
 visible: true
 ---
 
-`Laika` is a feature rich testing framework for [meteor](http://meteor.com). With laika you can simply write test with interacting with **both** server and client(s).
+`Laika` is a feature rich testing framework for [meteor](http://meteor.com). With laika you can simply write test that interact with **both** server and client(s).
 
 ##Installation and Setup
 
@@ -14,7 +14,7 @@ visible: true
 
 * Download and install [`phantomJS`](http://phantomjs.org/download.html)
 
-* You need to start a separate `mongodb` server with following options (It makes testing much speeder)
+* You need to start a separate `mongodb` server with following options (It makes testing much speedier)
 
     `mongod --smallfiles --noprealloc --nojournal`
 
@@ -90,14 +90,14 @@ this test also goes within the `Posts` suite
     });
 
 * Now we are observing a collection in the server
-* Client do the insert and we'll catch it on the server
-* You might have seen that our `server` object support method chaining as well :)
+* Client does the insert and we'll catch it on the server
+* You might have seen that our `server` object supports method chaining as well :)
 
-lets see the result
+Let's see the result
 
 ![Second test result](images/getting-started/two.png)
 
-### Lets write one last test with involving two clients
+### Let's write one last test with involving two clients
 
     test('using two client', function(done, server, c1, c2) {
       c1.eval(function() {

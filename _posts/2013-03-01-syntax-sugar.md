@@ -1,14 +1,14 @@
 ---
 layout: post
-title: Syntax Suger
+title: Syntax Sugar
 visible: true
 ---
 
 ## Synchronous execution with .evalSync()
 
-You've seen that `laika` uses [EventEmitter](http://www.sitepoint.com/nodejs-events-and-eventemitter/) like pattern to communicate with the evaluated code and the test. EventEmitter pattern is very useful if you want to send multiple results from the evaluated code at random events.
+You've seen that `laika` uses an [EventEmitter](http://www.sitepoint.com/nodejs-events-and-eventemitter/) like pattern to communicate with the evaluated code and the test. The EventEmitter pattern is very useful if you want to send multiple results from the evaluated code at random events.
 
-But if you just have only one result to be sent, and the test code is depends on it, EventEmitter pattern makes you to write unnecessary amount of code. 
+But if you only have one result to be sent, and the test code depends on it, EventEmitter makes you to write an unnecessary amount of code. 
 
 Fortunately laika has a synchronous execution mode. You can simpy enable it by using `.evalSync()` instead of `.eval()`.
 
@@ -58,7 +58,7 @@ If you want to send result(and the control) back to test, you must call `emit('r
 
 ### You can emit other events too
 
-It is still possible to emit other events with `.evalSync()`, but they must be emitted after `return` event has been triggered. Otherwise those events will be ignored.
+It is still possible to emit other events with `.evalSync()`, but they must be emitted after the `return` event has been triggered. Otherwise those events will be ignored.
 
     test('emitting other events', function(done, server, client) {
       var result = server.evalSync(function() {
@@ -76,7 +76,7 @@ It is still possible to emit other events with `.evalSync()`, but they must be e
 
 ### You can only use .evalSync() only inside the main callback
 
-Although `.evalSync()` is a powerful feature, you can't use it everywhere. It can be only use in the main test callback. If you try to use `.evalSync()` inside a nested callback function, it throws an error. See following example.
+Although `.evalSync()` is a powerful feature, you can't use it everywhere. It can be only used in the main test callback. If you try to use `.evalSync()` inside a nested callback function, it throws an error. See following example.
 
     test('.evalSync() get failed', function(done, server, client) {
       server.eval(function() {
