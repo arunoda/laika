@@ -4,7 +4,7 @@ title: Using a ramdisk for mongodb data directory
 visible: false
 ---
 
-You can make test run **3 times** faster with using a ramdisk for your mongodb data directory. These days most of the dev boxes runs with 8 GB or more RAM. So using 1GB as a ramdisk for mongo should not be a big issue.
+You can make test run **3 times** faster by using a ramdisk for your mongodb data directory. These days most of the dev boxes runs with 8 GB or more RAM. So using 1GB as a ramdisk for mongo should not be a big issue.
 
 ## Create your ram disk
 

@@ -7,12 +7,12 @@ visible: true
 `laika` is created by [`arunoda`](https://github.com/arunoda) with using some of the greatest [open source projects](http://goo.gl/qDGgx).
 
 ## Code and Documentation
-We need your contribution for the [`laika`](https://github.com/arunoda/laika) itself and for the [this documentation](https://github.com/arunoda/laika/tree/gh-pages)
+We need your contribution for [`laika`](https://github.com/arunoda/laika) itself and for [this documentation](https://github.com/arunoda/laika/tree/gh-pages)
 
 Please fork and make pull requests :)
 
 ## Issues
-`laika` is so new and not much tested. Please submit [issues](https://github.com/arunoda/laika/issues) if have had some hard time with laika.
+`laika` is new and not much tested. Please submit [issues](https://github.com/arunoda/laika/issues) if you have a hard time with laika.
 
 ## License
 
