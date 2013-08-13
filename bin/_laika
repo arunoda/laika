@@ -86,7 +86,12 @@ module.exports = {
 
     deps.ready(function() {
       logger.info('  loading initial app pool...');
-      appPool = new AppPool({size: 2, appDir: './', mongoPort: argv.mport});
+      appPool = new AppPool({
+          size: 2,
+          appDir: './',
+          mongoPort: argv.mport,
+          settingsFile: argv.settings
+      });
       appPool.on('ready', onAppPoolReady);
 
       if(argv.ui == 'tdd') {
