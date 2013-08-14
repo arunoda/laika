@@ -8,6 +8,7 @@ var optionsParser = commander
   .usage('[options] [path filter]')
   .version(laika.version())
   .option('-m, --mport <port>', 'specify mongodb port [default: 27017]', 27017)
+  .option('-s, --settings <filename>', 'specify location of meteor settings', '')
   .option('-u, --ui <tdd|bdd>', 'specify test user interfaces (tdd|bdd) [default: tdd]', 'tdd')
   .option('-R, --reporter <reporter>', 'specify reporter to use (support all mocha reporters) [default: spec]', 'spec')
   .option('-t, --timeout <ms>', 'test-case timeout in milliseconds [default: 2000]', 2000)
