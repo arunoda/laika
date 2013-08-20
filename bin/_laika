@@ -90,7 +90,7 @@ module.exports = {
           size: 2,
           appDir: './',
           mongoPort: argv.mport,
-          settingsFile: argv.settings
+          settingsFile: (argv.settings)? path.resolve(argv.settings) : null
       });
       appPool.on('ready', onAppPoolReady);
 
