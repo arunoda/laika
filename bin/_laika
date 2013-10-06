@@ -22,12 +22,8 @@ var ended = false;
 
 module.exports = {
   run: function(argv) {
-    if(argv.debug) {
-      //adding addition support for the --debug
-      argv.reporter = 'tap';
-      logger.setVerbose(true);
-    } else if(argv.deepDebug) {
-      //adding addition support for the --deep-debug
+    if(argv.verbose) {
+      //adding addition support for the --verbose
       argv.reporter = 'tap';
       logger.setVerbose(true);
       logger.setDeepVerbose(true);
@@ -176,7 +172,7 @@ module.exports = {
 
   version: function() {
     var packageJson = require('../package.json');
-    return packageJson.version;
+    console.log(packageJson.version);
   },
 
   actions: require('../lib/actions')

@@ -6,7 +6,6 @@ laika = require('./_laika');
 
 var optionsParser = commander
   .usage('[options] [path filter]')
-  .version(laika.version())
   .option('-m, --mport <port>', 'specify mongodb port [default: 27017]', 27017)
   .option('-u, --ui <tdd|bdd>', 'specify test user interfaces (tdd|bdd) [default: tdd]', 'tdd')
   .option('-R, --reporter <reporter>', 'specify reporter to use (support all mocha reporters) [default: spec]', 'spec')
@@ -15,15 +14,18 @@ var optionsParser = commander
   .option('-c, --compilers <ext:module>', 'use the given module(s) to compile files')
   .option('-g, --grep <pattern>', 'only run tests matching')
   .option('-i, --invert', 'inverts --grep matches')
-  .option('-d, --debug', 'print logs from client/server', false)
-  .option('-D, --deep-debug', 'print more debug logs', false)
+  .option('-V, --verbose', 'run with verbose mode with logs from client/server', false)
   .option('-v, --version', 'print version', false)
   .option('--slow <ms>', '"slow" test threshold in milliseconds [default: 1200]', 1200);
 
 process.argv = parseOptsFile('laika.opts', process.argv);
 var argv = optionsParser.parse(process.argv);
 
-laika.run(argv);
+if(Object.keys(argv).indexOf('version') >= 0) {
+  laika.version();
+} else {
+  laika.run(argv);
+}
 
 function parseOptsFile(filePath, argv) {
   newArgv = argv;
