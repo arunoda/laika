@@ -241,3 +241,8 @@ function generateIsSourceFileAllowed(compilers) {
     return allowOnlyProperSourceFiles.test(filename);
   }
 }
+
+process.on('SIGINT', function() {
+  injector.clean();
+  process.exit();
+});
