@@ -13,6 +13,7 @@ var optionsParser = commander
   .option('-s, --settings <settings-file>', 'specify a settings file for your meteor app')
   .option('-t, --timeout <ms>', 'test-case timeout in milliseconds [default: 2000]', 2000)
   .option('-c, --compilers <ext:module>', 'use the given module(s) to compile files')
+  .option('-g, --grep <pattern>', 'only run tests matching')
   .option('-d, --debug', 'print logs from client/server', false)
   .option('-D, --deep-debug', 'print more debug logs', false)
   .option('-v, --version', 'print version', false);
