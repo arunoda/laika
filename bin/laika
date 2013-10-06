@@ -17,7 +17,8 @@ var optionsParser = commander
   .option('-i, --invert', 'inverts --grep matches')
   .option('-d, --debug', 'print logs from client/server', false)
   .option('-D, --deep-debug', 'print more debug logs', false)
-  .option('-v, --version', 'print version', false);
+  .option('-v, --version', 'print version', false)
+  .option('--slow <ms>', '"slow" test threshold in milliseconds [default: 1200]', 1200);
 
 process.argv = parseOptsFile('laika.opts', process.argv);
 var argv = optionsParser.parse(process.argv);

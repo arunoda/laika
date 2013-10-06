@@ -109,7 +109,8 @@ module.exports = {
           ui: argv.ui,
           timeout: argv.timeout,
           grep: argv.grep,
-          invert: argv.invert
+          invert: argv.invert,
+          slow: argv.slow
       };
 
       //requring compiler modules
