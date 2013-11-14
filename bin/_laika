@@ -9,6 +9,7 @@ var testLogic = require('../lib/test_logic');
 var helpers = require('../lib/helpers');
 var logger = require('../lib/logger');
 var qbox = require('qbox');
+var glob = require('glob');
 var Mocha = require('mocha');
 var fs = require('fs');
 var path = require('path');
@@ -124,8 +125,13 @@ module.exports = {
       }
 
       var mocha = new Mocha(mochaOptions);
-      var testsPath = argv.args[0] || './tests';
-      identifyTests(testsPath, mocha);
+      var args = argv.args;
+      if (!args.length) {
+        args.push('tests')
+      }
+      args.forEach(function (arg) {
+        identifyTests(arg, mocha);
+      })
       var runner = mocha.run(function(failedCount) {
         var exitCode = (failedCount > 0)? 1: 0;
         atTheEnd(exitCode);
@@ -137,7 +143,19 @@ module.exports = {
       if(stat.isDirectory()) {
         scanFiles(path, mocha, {});
       } else {
-        mocha.addFile(path);
+        if (fs.existsSync(path)) {
+          mocha.addFile(path)
+        } else {
+          if (fs.existsSync(path + '.js')) {
+            path += '.js'
+            mocha.addFile(path)
+          } else {
+            console.log("Found a GLOB, attempting to execute.")
+            glob.sync(path).forEach(function (file) {
+              mocha.addFile(file)
+            })
+          }
+        }
       }
     }
 
