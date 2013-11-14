@@ -127,7 +127,7 @@ module.exports = {
       var mocha = new Mocha(mochaOptions);
       var args = argv.args;
       if (!args.length) {
-        args.push('tests')
+        args.push('./tests')
       }
       args.forEach(function (arg) {
         identifyTests(arg, mocha);
@@ -150,7 +150,6 @@ module.exports = {
             path += '.js'
             mocha.addFile(path)
           } else {
-            console.log("Found a GLOB, attempting to execute.")
             glob.sync(path).forEach(function (file) {
               mocha.addFile(file)
             })
