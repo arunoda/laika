@@ -63,7 +63,7 @@ module.exports = {
       App.touch(deps.tick.bind(deps), {mongoPort: argv.mport});
 
       logger.info('  loading phantomjs...');
-      Phantom.create(afterPhantomCreated, {parameters: {
+      Phantom.create(afterPhantomCreated, {phantomPath:require('phantomjs').path, parameters: {
         'load-images': false
       }});
 
