@@ -183,7 +183,7 @@ module.exports = {
 
         phantom._phantom.stdout.removeListener('data', onPhantomLogs);
         phantom._phantom.stderr.removeListener('data', onPhantomLogs);
-        phantom._phantom.kill('SIGKILL');
+        phantom.exit();
 
         appPool.close(function() {
           process.exit(exitCode);
