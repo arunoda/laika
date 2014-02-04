@@ -9,9 +9,17 @@ var Fiber = require('fibers');
 
 var SERVER_TEMPLATE_LOCATION = path.resolve(__dirname, '../lib/injector/templates/server.js');
 
+//setting up the minimal Meteor env.
+var Meteor = {
+  startup: function(callback) {
+    callback();
+  },
+  setTimeout: setTimeout
+};
+var Npm = {require: require};
+
 suite('ServerConnector', function() {
   test('run in server and get result', function(done) {
-    var Npm = {require: require};
     var template = handlebars.compile(fs.readFileSync(SERVER_TEMPLATE_LOCATION, 'utf8'));
     var serverCode = template();
     
@@ -32,8 +40,6 @@ suite('ServerConnector', function() {
   });
 
   test('run fibered code', function(done) {
-    var Npm = {require: require};
-    var Meteor = {setTimeout: setTimeout};
     var template = handlebars.compile(fs.readFileSync(SERVER_TEMPLATE_LOCATION, 'utf8'));
     var serverCode = template();
     
@@ -63,7 +69,6 @@ suite('ServerConnector', function() {
   });
 
   test('send arguments to server with the function', function(done) {
-    var Npm = {require: require};
     var template = handlebars.compile(fs.readFileSync(SERVER_TEMPLATE_LOCATION, 'utf8'));
     var serverCode = template();
     
@@ -84,7 +89,6 @@ suite('ServerConnector', function() {
   });
 
   test('run in server and get result with .evalSync()', function(done) {
-    var Npm = {require: require};
     var template = handlebars.compile(fs.readFileSync(SERVER_TEMPLATE_LOCATION, 'utf8'));
     var serverCode = template();
     
