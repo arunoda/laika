@@ -173,7 +173,7 @@ module.exports = {
         }
       }
       if(notInstalled.length === 0) {
-        deps.tick();
+        initializePlugins();
       } else {
         logger.info('  installing plug-ins: ' + notInstalled.join(', '));
         var cwd = process.cwd();
@@ -194,7 +194,7 @@ module.exports = {
               loadPluginPackage(testsPath, packageName);
             }
             process.chdir(cwd);
-            deps.tick();
+            initializePlugins();
           });
         });
       }
@@ -220,6 +220,29 @@ module.exports = {
         });
       }
       return true;
+    }
+
+    function initializePlugins() {
+      var inits = [];
+      plugins.forEach(function (plugin) {
+        if(plugin.helper.initialize !== undefined) {
+          inits.push(plugin);
+        }
+      });
+      if(inits.length === 0) {
+        deps.tick();
+      } else {
+        var plugin_deps = qbox.create(inits.length);
+        plugin_deps.ready(function() {
+          deps.tick();
+        });
+        inits.forEach(function (plugin) {
+          logger.info('  initializing ' + plugin.name + '...');
+          plugin.helper.initialize(function() {
+            plugin_deps.tick();
+          });
+        });
+      }
     }
 
     function identifyTests(testsPath, mocha) {
@@ -263,6 +286,27 @@ module.exports = {
       });
     }
 
+    function shutdownPlugins(callback) {
+      var shutdowns = [];
+      plugins.forEach(function (plugin) {
+        if(plugin.helper.shutdown !== undefined) {
+          shutdowns.push(plugin);
+        }
+      });
+      if(shutdowns.length === 0) {
+        callback();
+      } else {
+        var plugin_deps = qbox.create(shutdowns.length);
+        plugin_deps.ready(callback);
+        shutdowns.forEach(function (plugin) {
+          logger.info('  initializing ' + plugin.name);
+          plugin.helper.shutdown(function() {
+            plugin_deps.tick();
+          });
+        });
+      }
+    }
+
     function atTheEnd(exitCode) {
       if(!ended) {
         logger.info('  cleaning up injected code\n');
@@ -274,12 +318,14 @@ module.exports = {
           phantom.exit();
         }
 
-        if(appPool !== undefined) {
-          appPool.close(function() {
-            process.exit(exitCode);
-          });
-        }
-        ended = true;
+        shutdownPlugins(function() {
+          if(appPool !== undefined) {
+            appPool.close(function() {
+              process.exit(exitCode);
+            });
+          }
+          ended = true;
+        });
       }
     }
   },
