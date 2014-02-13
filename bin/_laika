@@ -193,7 +193,6 @@ module.exports = {
             for(packageName in notInstalled) {
               loadPluginPackage(testsPath, packageName);
             }
-            process.exit(0);
             process.chdir(cwd);
             deps.tick();
           });
