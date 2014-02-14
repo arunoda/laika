@@ -36,12 +36,8 @@ module.exports = {
       logger.setDeepVerbose(true);
     }
 
-    var args = argv.args;
-    if (!args.length) {
-      args.push('./tests')
-    }
-    // potential plug-in directories + phantom + appPool
-    deps = qbox.create(args.length + 2);
+    // loading helpers + phantom + appPool
+    deps = qbox.create(3);
 
     var compilers = parseCompilers(argv.compilers);
     var isSourceFileAllowed = generateIsSourceFileAllowed(compilers);
@@ -78,7 +74,7 @@ module.exports = {
         'load-images': false
       }});
 
-      args.forEach(loadPlugins);
+      loadPlugins('./tests', deps.tick.bind(deps));
 
       //make sure this get ended everytime
       process.once('exit', function() {
@@ -138,6 +134,10 @@ module.exports = {
         });
       }
 
+      var args = argv.args;
+      if (!args.length) {
+        args.push('./tests')
+      }
       var mocha = new Mocha(mochaOptions);
       args.forEach(function (arg) {
         identifyTests(arg, mocha);
@@ -148,7 +148,7 @@ module.exports = {
       });
     }
 
-    function loadPlugins(testsPath) {
+    function loadPlugins(testsPath, callback) {
       // could test if path is a dir like for identifyTests, but if it isn't the
       // package.json is just not going to be found...
       // TODO: if a test *file* is specified, should we load plugins from the
@@ -158,7 +158,7 @@ module.exports = {
         var json = require(testsPath + '/package.json');
       } catch(error) {
         if(error.code === 'MODULE_NOT_FOUND') {
-          deps.tick();
+          callback();
           return;
         } else {
           throw error;
@@ -172,8 +172,9 @@ module.exports = {
           spec.push(packageName + '@' + json.dependencies[packageName]);
         }
       }
+
       if(notInstalled.length === 0) {
-        initializePlugins();
+        initializePlugins(plugins, callback);
       } else {
         logger.info('  installing plug-ins: ' + notInstalled.join(', '));
         var cwd = process.cwd();
@@ -194,14 +195,13 @@ module.exports = {
               loadPluginPackage(testsPath, packageName);
             }
             process.chdir(cwd);
-            initializePlugins();
+            initializePlugins(plugins, callback);
           });
         });
       }
     }
 
     function loadPluginPackage(where, packageName) {
-      logger.info('  loading ' + packageName + ' from ' + where + '...');
       try {
         var package = require(where + '/node_modules/' + packageName);
       } catch(error) {
@@ -211,6 +211,7 @@ module.exports = {
           throw error;
         }
       }
+      
       var helper = package.laikaHelper;
       if(helper !== undefined) {
         plugins.push({
@@ -222,20 +223,23 @@ module.exports = {
       return true;
     }
 
-    function initializePlugins() {
+    function initializePlugins(plugins, callback) {
+      if(plugins.length == 0) return callback();
+
+      logger.info('  loading plugins ' + plugins.join(', '));
       var inits = [];
       plugins.forEach(function (plugin) {
         if(plugin.helper.initialize !== undefined) {
           inits.push(plugin);
         }
       });
+
       if(inits.length === 0) {
         deps.tick();
       } else {
         var plugin_deps = qbox.create(inits.length);
-        plugin_deps.ready(function() {
-          deps.tick();
-        });
+        plugin_deps.ready(callback);
+
         inits.forEach(function (plugin) {
           logger.info('  initializing ' + plugin.name + '...');
           plugin.helper.initialize(function() {
@@ -286,7 +290,7 @@ module.exports = {
       });
     }
 
-    function shutdownPlugins(callback) {
+    function shutdownPlugins(plugins, callback) {
       var shutdowns = [];
       plugins.forEach(function (plugin) {
         if(plugin.helper.shutdown !== undefined) {
@@ -309,7 +313,7 @@ module.exports = {
 
     function atTheEnd(exitCode) {
       if(!ended) {
-        logger.info('  cleaning up injected code\n');
+        logger.info('\n  cleaning up injected code\n');
         injector.clean();
 
         if(phantom !== undefined) {
@@ -318,7 +322,7 @@ module.exports = {
           phantom.exit();
         }
 
-        shutdownPlugins(function() {
+        shutdownPlugins(plugins, function() {
           if(appPool !== undefined) {
             appPool.close(function() {
               process.exit(exitCode);
