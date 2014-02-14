@@ -14,9 +14,11 @@ var Mocha = require('mocha');
 var fs = require('fs');
 var path = require('path');
 var exec = require('child_process').exec;
+var npm = require('npm');
 
 var injector = new Injector();
-var deps = qbox.create(2);
+var deps;
+var plugins = [];
 var phantom;
 var appPool;
 var ended = false;
@@ -33,6 +35,13 @@ module.exports = {
       logger.setVerbose(true);
       logger.setDeepVerbose(true);
     }
+
+    var args = argv.args;
+    if (!args.length) {
+      args.push('./tests')
+    }
+    // potential plug-in directories + phantom + appPool
+    deps = qbox.create(args.length + 2);
 
     var compilers = parseCompilers(argv.compilers);
     var isSourceFileAllowed = generateIsSourceFileAllowed(compilers);
@@ -63,10 +72,13 @@ module.exports = {
       injector.inject();
       App.touch(deps.tick.bind(deps), {mongoPort: argv.mport});
 
+      // treat it as much as possible as a "built-in plug-in" for now
       logger.info('  loading phantomjs...');
       Phantom.create(afterPhantomCreated, {parameters: {
         'load-images': false
       }});
+
+      args.forEach(loadPlugins);
 
       //make sure this get ended everytime
       process.once('exit', function() {
@@ -82,6 +94,7 @@ module.exports = {
         phantom = ph;
         phantom._phantom.stdout.on('data', onPhantomLogs);
         phantom._phantom.stderr.on('data', onPhantomLogs);
+        // plugins.push(...);
         deps.tick();
       }
     }
@@ -97,16 +110,16 @@ module.exports = {
       appPool.on('ready', onAppPoolReady);
 
       if(argv.ui == 'tdd') {
-        test = testLogic(appPool, phantom);
+        test = testLogic(appPool, plugins, phantom);
         ltest = ltestWithWarning(test);
       } else if(argv.ui == 'bdd') {
-        it = testLogic(appPool, phantom);
+        it = testLogic(appPool, plugins, phantom);
       }
     });
 
     function onAppPoolReady() {
       // require('mocha/bin/_mocha');
-      var mochaOptions= {
+      var mochaOptions = {
           reporter: argv.reporter,
           ui: argv.ui,
           timeout: argv.timeout,
@@ -126,10 +139,6 @@ module.exports = {
       }
 
       var mocha = new Mocha(mochaOptions);
-      var args = argv.args;
-      if (!args.length) {
-        args.push('./tests')
-      }
       args.forEach(function (arg) {
         identifyTests(arg, mocha);
       })
@@ -139,19 +148,93 @@ module.exports = {
       });
     }
 
-    function identifyTests(path, mocha) {
-      var stat = fs.statSync(path);
-      if(stat.isDirectory()) {
-        scanFiles(path, mocha, {});
-      } else {
-        if (fs.existsSync(path)) {
-          mocha.addFile(path)
+    function loadPlugins(testsPath) {
+      // could test if path is a dir like for identifyTests, but if it isn't the
+      // package.json is just not going to be found...
+      // TODO: if a test *file* is specified, should we load plugins from the
+      // parent dir? --LaloMartins
+      testsPath = path.resolve(testsPath);
+      try {
+        var json = require(testsPath + '/package.json');
+      } catch(error) {
+        if(error.code === 'MODULE_NOT_FOUND') {
+          deps.tick();
+          return;
         } else {
-          if (fs.existsSync(path + '.js')) {
-            path += '.js'
-            mocha.addFile(path)
+          throw error;
+        }
+      }
+
+      var notInstalled = [], spec = [];
+      for(packageName in json.dependencies) {
+        if(!loadPluginPackage(testsPath, packageName)) {
+          notInstalled.push(packageName);
+          spec.push(packageName + '@' + json.dependencies[packageName]);
+        }
+      }
+      if(notInstalled.length === 0) {
+        deps.tick();
+      } else {
+        logger.info('  installing plug-ins: ' + notInstalled.join(', '));
+        var cwd = process.cwd();
+        process.chdir(testsPath);
+        npm.load({verbose: argv.verbose}, function(error, Npm) {
+          if(error) {
+            // this doesn't seem to ever happen though
+            logger.error('  failed to inintialize Npm');
+            logger.error(error);
+            process.exit(1);
+          }
+          Npm.commands.install(spec, function(error, installed) {
+            if(error != null) {
+              logger.error('  ' + error.message);
+              process.exit(1);
+            }
+            for(packageName in notInstalled) {
+              loadPluginPackage(testsPath, packageName);
+            }
+            process.chdir(cwd);
+            deps.tick();
+          });
+        });
+      }
+    }
+
+    function loadPluginPackage(where, packageName) {
+      logger.info('  loading ' + packageName + ' from ' + where + '...');
+      try {
+        var package = require(where + '/node_modules/' + packageName);
+      } catch(error) {
+        if(error.code === 'MODULE_NOT_FOUND') {
+          return false;
+        } else {
+          throw error;
+        }
+      }
+      var helper = package.laikaHelper;
+      if(helper !== undefined) {
+        plugins.push({
+          name: packageName,
+          from: where,
+          helper: helper
+        });
+      }
+      return true;
+    }
+
+    function identifyTests(testsPath, mocha) {
+      var stat = fs.statSync(testsPath);
+      if(stat.isDirectory()) {
+        scanFiles(testsPath, mocha, {});
+      } else {
+        if (fs.existsSync(testsPath)) {
+          mocha.addFile(testsPath)
+        } else {
+          if (fs.existsSync(testsPath + '.js')) {
+            testsPath += '.js'
+            mocha.addFile(testsPath)
           } else {
-            glob.sync(path).forEach(function (file) {
+            glob.sync(testsPath).forEach(function (file) {
               mocha.addFile(file)
             })
           }
@@ -185,13 +268,17 @@ module.exports = {
         logger.info('  cleaning up injected code\n');
         injector.clean();
 
-        phantom._phantom.stdout.removeListener('data', onPhantomLogs);
-        phantom._phantom.stderr.removeListener('data', onPhantomLogs);
-        phantom.exit();
+        if(phantom !== undefined) {
+          phantom._phantom.stdout.removeListener('data', onPhantomLogs);
+          phantom._phantom.stderr.removeListener('data', onPhantomLogs);
+          phantom.exit();
+        }
 
-        appPool.close(function() {
-          process.exit(exitCode);
-        });
+        if(appPool !== undefined) {
+          appPool.close(function() {
+            process.exit(exitCode);
+          });
+        }
         ended = true;
       }
     }
