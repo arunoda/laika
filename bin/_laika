@@ -153,6 +153,7 @@ module.exports = {
         var json = require(testsPath + '/package.json');
       } catch(error) {
         if(error.code === 'MODULE_NOT_FOUND') {
+          // maybe later here we import a list of "default" helpers, e.g. phantom
           deps.tick();
           return;
         } else {
@@ -160,39 +161,29 @@ module.exports = {
         }
       }
 
-      var notInstalled = [], spec = [];
-      for(packageName in json.dependencies) {
-        if(!loadPluginPackage(testsPath, packageName)) {
-          notInstalled.push(packageName);
-          spec.push(packageName + '@' + json.dependencies[packageName]);
+      logger.info('  installing and updating plug-ins...');
+      var cwd = process.cwd();
+      process.chdir(testsPath);
+      npm.load({verbose: argv.verbose}, function(error, Npm) {
+        if(error) {
+          // this doesn't seem to ever happen though
+          logger.error('  failed to inintialize Npm');
+          logger.error(error);
+          process.exit(1);
         }
-      }
-      if(notInstalled.length === 0) {
-        initializePlugins();
-      } else {
-        logger.info('  installing plug-ins: ' + notInstalled.join(', '));
-        var cwd = process.cwd();
-        process.chdir(testsPath);
-        npm.load({verbose: argv.verbose}, function(error, Npm) {
-          if(error) {
-            // this doesn't seem to ever happen though
-            logger.error('  failed to inintialize Npm');
-            logger.error(error);
+        Npm.commands.install([], function(error, installed) {
+          if(error != null) {
+            logger.error('  ' + error.message);
             process.exit(1);
           }
-          Npm.commands.install(spec, function(error, installed) {
-            if(error != null) {
-              logger.error('  ' + error.message);
-              process.exit(1);
-            }
-            for(packageName in notInstalled) {
-              loadPluginPackage(testsPath, packageName);
-            }
-            process.chdir(cwd);
-            initializePlugins();
-          });
+          for(packageName in json.dependencies) {
+            loadPluginPackage(testsPath, packageName);
+          }
+          process.chdir(cwd);
+          initializePlugins();
         });
-      }
+      });
+
     }
 
     function loadPluginPackage(where, packageName) {
