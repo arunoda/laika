@@ -8,7 +8,6 @@ var AppPool = require('../lib/app_pool');
 var testLogic = require('../lib/test_logic');
 var helpers = require('../lib/helpers');
 var logger = require('../lib/logger');
-var pluginsHelper = require('../lib/plugins_helper');
 var qbox = require('qbox');
 var glob = require('glob');
 var Mocha = require('mocha');
@@ -21,12 +20,14 @@ var injector = new Injector();
 // loading for plugins + phantom + appPool
 var deps = qbox.create(3);
 var loadedPlugins = [];
+var pluginsHelper = null
 var phantom;
 var appPool;
 var ended = false;
 
 module.exports = {
   run: function(argv) {
+    pluginsHelper = require('../lib/plugins_helper')({argv: argv});
     if(argv.debug) {
       logger.log('\n  NOTICE: '.yellow + 'if you are looking for debug logs(-d or -D), use -V instead'.bold);
     }
