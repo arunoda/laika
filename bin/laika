@@ -17,6 +17,7 @@ var optionsParser = commander
   .option('-d, --debug', "enable node's debugger, synonym for node --debug")
   .option('-V, --verbose', 'run with verbose mode with logs from client/server', false)
   .option('-v, --version', 'print version', false)
+  .option('-N, --ignore-npm-install', 'avoid npm install on startup', false)
   .option('--debug-brk', "enable node's debugger breaking on the first line", false)
   .option('--slow <ms>', '"slow" test threshold in milliseconds [default: 1200]', 1200);
 

@@ -17,14 +17,17 @@ var exec = require('child_process').exec;
 var npm = require('npm');
 
 var injector = new Injector();
-var deps;
-var plugins = [];
+// loading for plugins + phantom + appPool
+var deps = qbox.create(3);
+var loadedPlugins = [];
+var pluginsHelper = null
 var phantom;
 var appPool;
 var ended = false;
 
 module.exports = {
   run: function(argv) {
+    pluginsHelper = require('../lib/plugins_helper')({argv: argv});
     if(argv.debug) {
       logger.log('\n  NOTICE: '.yellow + 'if you are looking for debug logs(-d or -D), use -V instead'.bold);
     }
@@ -35,13 +38,6 @@ module.exports = {
       logger.setVerbose(true);
       logger.setDeepVerbose(true);
     }
-
-    var args = argv.args;
-    if (!args.length) {
-      args.push('./tests')
-    }
-    // potential plug-in directories + phantom + appPool
-    deps = qbox.create(args.length + 2);
 
     var compilers = parseCompilers(argv.compilers);
     var isSourceFileAllowed = generateIsSourceFileAllowed(compilers);
@@ -78,7 +74,10 @@ module.exports = {
         'load-images': false
       }});
 
-      args.forEach(loadPlugins);
+      pluginsHelper.load('./tests', function(plugins) {
+        loadedPlugins = plugins;
+        deps.tick();
+      });
 
       //make sure this get ended everytime
       process.once('exit', function() {
@@ -110,10 +109,10 @@ module.exports = {
       appPool.on('ready', onAppPoolReady);
 
       if(argv.ui == 'tdd') {
-        test = testLogic(appPool, plugins, phantom);
+        test = testLogic(appPool, loadedPlugins, phantom);
         ltest = ltestWithWarning(test);
       } else if(argv.ui == 'bdd') {
-        it = testLogic(appPool, plugins, phantom);
+        it = testLogic(appPool, loadedPlugins, phantom);
       }
     });
 
@@ -138,6 +137,10 @@ module.exports = {
         });
       }
 
+      var args = argv.args;
+      if (!args.length) {
+        args.push('./tests')
+      }
       var mocha = new Mocha(mochaOptions);
       args.forEach(function (arg) {
         identifyTests(arg, mocha);
@@ -146,103 +149,6 @@ module.exports = {
         var exitCode = (failedCount > 0)? 1: 0;
         atTheEnd(exitCode);
       });
-    }
-
-    function loadPlugins(testsPath) {
-      // could test if path is a dir like for identifyTests, but if it isn't the
-      // package.json is just not going to be found...
-      // TODO: if a test *file* is specified, should we load plugins from the
-      // parent dir? --LaloMartins
-      testsPath = path.resolve(testsPath);
-      try {
-        var json = require(testsPath + '/package.json');
-      } catch(error) {
-        if(error.code === 'MODULE_NOT_FOUND') {
-          deps.tick();
-          return;
-        } else {
-          throw error;
-        }
-      }
-
-      var notInstalled = [], spec = [];
-      for(packageName in json.dependencies) {
-        if(!loadPluginPackage(testsPath, packageName)) {
-          notInstalled.push(packageName);
-          spec.push(packageName + '@' + json.dependencies[packageName]);
-        }
-      }
-      if(notInstalled.length === 0) {
-        initializePlugins();
-      } else {
-        logger.info('  installing plug-ins: ' + notInstalled.join(', '));
-        var cwd = process.cwd();
-        process.chdir(testsPath);
-        npm.load({verbose: argv.verbose}, function(error, Npm) {
-          if(error) {
-            // this doesn't seem to ever happen though
-            logger.error('  failed to inintialize Npm');
-            logger.error(error);
-            process.exit(1);
-          }
-          Npm.commands.install(spec, function(error, installed) {
-            if(error != null) {
-              logger.error('  ' + error.message);
-              process.exit(1);
-            }
-            for(packageName in notInstalled) {
-              loadPluginPackage(testsPath, packageName);
-            }
-            process.chdir(cwd);
-            initializePlugins();
-          });
-        });
-      }
-    }
-
-    function loadPluginPackage(where, packageName) {
-      logger.info('  loading ' + packageName + ' from ' + where + '...');
-      try {
-        var package = require(where + '/node_modules/' + packageName);
-      } catch(error) {
-        if(error.code === 'MODULE_NOT_FOUND') {
-          return false;
-        } else {
-          throw error;
-        }
-      }
-      var helper = package.laikaHelper;
-      if(helper !== undefined) {
-        plugins.push({
-          name: packageName,
-          from: where,
-          helper: helper
-        });
-      }
-      return true;
-    }
-
-    function initializePlugins() {
-      var inits = [];
-      plugins.forEach(function (plugin) {
-        if(plugin.helper.initialize !== undefined) {
-          inits.push(plugin);
-        }
-      });
-      if(inits.length === 0) {
-        deps.tick();
-      } else {
-        var plugin_deps = qbox.create(inits.length);
-        plugin_deps.ready(function() {
-          deps.tick();
-        });
-        inits.forEach(function (plugin) {
-          logger.info('  initializing ' + plugin.name + '...');
-          plugin.helper.initialize(function() {
-            plugin_deps.tick();
-          });
-        });
-      }
     }
 
     function identifyTests(testsPath, mocha) {
@@ -286,30 +192,10 @@ module.exports = {
       });
     }
 
-    function shutdownPlugins(callback) {
-      var shutdowns = [];
-      plugins.forEach(function (plugin) {
-        if(plugin.helper.shutdown !== undefined) {
-          shutdowns.push(plugin);
-        }
-      });
-      if(shutdowns.length === 0) {
-        callback();
-      } else {
-        var plugin_deps = qbox.create(shutdowns.length);
-        plugin_deps.ready(callback);
-        shutdowns.forEach(function (plugin) {
-          logger.info('  initializing ' + plugin.name);
-          plugin.helper.shutdown(function() {
-            plugin_deps.tick();
-          });
-        });
-      }
-    }
 
     function atTheEnd(exitCode) {
       if(!ended) {
-        logger.info('  cleaning up injected code\n');
+        logger.info('\n  cleaning up injected code\n');
         injector.clean();
 
         if(phantom !== undefined) {
@@ -318,7 +204,7 @@ module.exports = {
           phantom.exit();
         }
 
-        shutdownPlugins(function() {
+        pluginsHelper.shutdown(loadedPlugins, function() {
           if(appPool !== undefined) {
             appPool.close(function() {
               process.exit(exitCode);
