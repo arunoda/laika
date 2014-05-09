@@ -15,9 +15,9 @@ visible: true
 
 * Download and install [`phantomJS`](http://phantomjs.org/download.html)
 
-* You need to start a separate `mongodb` server with following options (It makes testing much speedier)
+* You need to start a separate `mongodb` server
 
-    `mongod --smallfiles --noprealloc --nojournal`
+    `mongod`
 
 ##Write your first test with laika
 
