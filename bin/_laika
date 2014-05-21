@@ -37,6 +37,7 @@ module.exports = {
     var compilers = parseCompilers(argv.compilers);
     var isSourceFileAllowed = generateIsSourceFileAllowed(compilers);
 
+    helpers.fixEnvironmentVariables();
     helpers.makeAssertFiberFriendly();
 
     //laika drops dbs after the test without any problem
