@@ -103,20 +103,21 @@ module.exports = {
         it = testLogic(appPool, phantom);
       }
       // see issue #62
-      setup = function (callback, options) {
+      setup = function (callback, clientOptions) {
         var app;
         if (arguments.length === 0) {
           return;
         }
-        // set default options
-        options = options || {};
-        if (!Array.isArray(options.clients) || options.clients.length === 0) {
-          options.clients = ['/', ];
+        // fix options
+        clientOptions = clientOptions || [];
+        while (clientOptions.length < callback.length - 1) {
+          // if no options is set, client won't be spanned correctly
+          clientOptions.push('/');
         }
         // define before/after hooks
         before(function (done) {
           app = appPool.get();
-          setupApp(app, phantom, options.clients, function () {
+          setupApp(app, phantom, clientOptions, function () {
             callback.apply(null, arguments);
             done();
           });
