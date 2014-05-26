@@ -87,6 +87,18 @@ module.exports = {
       }
     }
 
+    function repeat(times, value) {
+      var array = [];
+      while (--times >= 0) {
+        if (typeof value === 'function') {
+          array.push(value());
+        } else {
+          array.push(value);
+        }
+      }
+      return array;
+    }
+
     deps.ready(function() {
       logger.info('  loading initial app pool...');
       appPool = new AppPool({
@@ -115,11 +127,14 @@ module.exports = {
         if (!Array.isArray(clientOptions)) {
           if (typeof clientOptions === 'object') {
             // use clientOptions for each client
-            clientOptions = (new Array(nClients)).map(function () { return Object.create(clientOptions) });
+            clientOptions = repeat(nClients, function () {
+              // XXX maybe it would be better to copy these options?
+              return Object.create(clientOptions);
+            });
           } else if (typeof clientOptions === 'string') {
-            clientOptions = (new Array(nClients)).map(function () { return clientOptions });
+            clientOptions = repeat(nClients, clientOptions);
           } else {
-            clientOptions = new Array(nClients);
+            clientOptions = repeat(nClients, undefined);
           }
         } else {
           // make sure that we won't spawn unnecessary clients ...
