@@ -104,16 +104,32 @@ module.exports = {
       }
       // see issue #62
       setup = function (callback, clientOptions) {
+        var nClients = callback.length - 1;
         var connectors;
         var app;
         if (arguments.length === 0) {
           return;
         }
         // fix options
-        clientOptions = clientOptions || [];
-        while (clientOptions.length < callback.length - 1) {
-          // if no options is set, client won't be spanned correctly
-          clientOptions.push('/');
+        // check and fix options
+        if (!Array.isArray(clientOptions)) {
+          if (typeof clientOptions === 'object') {
+            // use clientOptions for each client
+            clientOptions = (new Array(nClients)).map(function () { return Object.create(clientOptions) });
+          } else if (typeof clientOptions === 'string') {
+            clientOptions = (new Array(nClients)).map(function () { return clientOptions });
+          } else {
+            clientOptions = new Array(nClients);
+          }
+        } else {
+          // make sure that we won't spawn unnecessary clients ...
+          clientOptions = clientOptions.slice(0, nClients);
+          // ... and that we have enough ...
+          while (clientOptions.length < nClients) {
+            // if no options is set, client won't be spawned correctly
+            // so we need to push an empty object at least
+            clientOptions.push(undefined);
+          }
         }
         // define before/after hooks
         before(function (done) {
