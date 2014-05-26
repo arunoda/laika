@@ -104,6 +104,7 @@ module.exports = {
       }
       // see issue #62
       setup = function (callback, clientOptions) {
+        var connectors;
         var app;
         if (arguments.length === 0) {
           return;
@@ -118,11 +119,15 @@ module.exports = {
         before(function (done) {
           app = appPool.get();
           setupApp(app, phantom, clientOptions, function () {
+            connectors = Array.prototype.slice.call(arguments);
             callback.apply(null, arguments);
             done();
           });
         });
         after(function () {
+          connectors.forEach(function (connector) {
+            connector.close();
+          });
           app.close();
         });
       }; // setup
