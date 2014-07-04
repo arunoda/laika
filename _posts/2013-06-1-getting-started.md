@@ -10,7 +10,7 @@ visible: true
 
 * First install laika from npm
 
-    `sudo npm install -g laika`<br>
+    `npm install -g laika`<br>
     (you might need to install [XCode Command Line Tools](https://github.com/arunoda/laika/issues/68) if you are on Mac)
 
 * Download and install [`phantomJS`](http://phantomjs.org/download.html)
