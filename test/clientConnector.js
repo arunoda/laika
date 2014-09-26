@@ -2,7 +2,7 @@ var assert = require('assert');
 var path = require('path');
 var fs = require('fs');
 var http = require('http');
-var Phantom = require('node-phantom');
+var Phantom = require('node-phantom-simple');
 var helpers = require('../lib/helpers');
 var ClientConnector = require('../lib/connectors/client.js');
 var Fiber = require('fibers');
@@ -200,7 +200,7 @@ suite('ClientConnector', function() {
   });
 
   test('**to kill phantom js**', function() {
-    phantom._phantom.kill();
+    phantom.process.kill();
   });
 })
 
