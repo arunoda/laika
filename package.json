@@ -18,7 +18,7 @@
     "laika": "./bin/laika"
   },
   "scripts": {
-    "test": "node_modules/.bin/mocha -u tdd -R spec -t 5000 --recursive test"
+    "test": "node_modules/.bin/mocha -u tdd -R spec -t 10000 --recursive test"
   },
   "author": "Arunoda Susiripala <arunoda.susiripala@gmail.com>",
   "repository": {
