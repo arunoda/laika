@@ -79,8 +79,8 @@ module.exports = {
         throw err;
       } else {
         phantom = ph;
-        phantom._phantom.stdout.on('data', onPhantomLogs);
-        phantom._phantom.stderr.on('data', onPhantomLogs);
+        phantom.process.stdout.on('data', onPhantomLogs);
+        phantom.process.stderr.on('data', onPhantomLogs);
         deps.tick();
       }
     }
@@ -181,8 +181,8 @@ module.exports = {
         logger.info('  cleaning up injected code\n');
         injector.clean();
 
-        phantom._phantom.stdout.removeListener('data', onPhantomLogs);
-        phantom._phantom.stderr.removeListener('data', onPhantomLogs);
+        phantom.process.stdout.removeListener('data', onPhantomLogs);
+        phantom.process.stderr.removeListener('data', onPhantomLogs);
         phantom.exit();
 
         appPool.close(function() {
