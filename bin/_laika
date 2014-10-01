@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-var Phantom = require('node-phantom');
 var colors = require('colors');
 var Injector = require('../lib/injector');
 var App = require('../lib/app');
@@ -14,6 +13,7 @@ var Mocha = require('mocha');
 var fs = require('fs');
 var path = require('path');
 var exec = require('child_process').exec;
+var startWebDriver = require('../lib/phantom');
 
 var injector = new Injector();
 var deps = qbox.create(2);
@@ -23,6 +23,9 @@ var ended = false;
 
 module.exports = {
   run: function(argv) {
+
+    var webDriverUrl;
+
     if(argv.debug) {
       logger.log('\n  NOTICE: '.yellow + 'if you are looking for debug logs(-d or -D), use -V instead'.bold);
     }
@@ -63,9 +66,11 @@ module.exports = {
       App.touch(deps.tick.bind(deps), {mongoPort: argv.mport});
 
       logger.info('  loading phantomjs...');
-      Phantom.create(afterPhantomCreated, {parameters: {
-        'load-images': false
-      }});
+
+      phantom = startWebDriver(function (err, _webDriverUrl) {
+        webDriverUrl = _webDriverUrl;
+        afterPhantomCreated(err);
+      });
 
       //make sure this get ended everytime
       process.once('exit', function() {
@@ -73,14 +78,13 @@ module.exports = {
       });
     }
 
-    function afterPhantomCreated(err, ph) {
-      if(err) {
+    function afterPhantomCreated (err) {
+      if (err) {
         logger.error('  please install phantomjs to countinue');
         throw err;
       } else {
-        phantom = ph;
-        phantom._phantom.stdout.on('data', onPhantomLogs);
-        phantom._phantom.stderr.on('data', onPhantomLogs);
+        phantom.stdout.on('data', onPhantomLogs);
+        phantom.stderr.on('data', onPhantomLogs);
         deps.tick();
       }
     }
@@ -96,10 +100,10 @@ module.exports = {
       appPool.on('ready', onAppPoolReady);
 
       if(argv.ui == 'tdd') {
-        test = testLogic(appPool, phantom);
+        test = testLogic(appPool, webDriverUrl);
         ltest = ltestWithWarning(test);
       } else if(argv.ui == 'bdd') {
-        it = testLogic(appPool, phantom);
+        it = testLogic(appPool, webDriverUrl);
       }
     });
 
@@ -181,9 +185,9 @@ module.exports = {
         logger.info('  cleaning up injected code\n');
         injector.clean();
 
-        phantom._phantom.stdout.removeListener('data', onPhantomLogs);
-        phantom._phantom.stderr.removeListener('data', onPhantomLogs);
-        phantom.exit();
+        phantom.stdout.removeListener('data', onPhantomLogs);
+        phantom.stderr.removeListener('data', onPhantomLogs);
+        phantom.kill('SIGINT');
 
         appPool.close(function() {
           process.exit(exitCode);
