@@ -60,7 +60,7 @@ module.exports = {
     function initialize() {
       logger.info('\n  injecting laika...');
       injector.inject();
-      App.touch(deps.tick.bind(deps), {mongoPort: argv.mport});
+      App.touch(deps.tick.bind(deps), {mongoPort: argv.mport, settingsFile: argv.settings});
 
       logger.info('  loading phantomjs...');
       Phantom.create(afterPhantomCreated, {parameters: {
