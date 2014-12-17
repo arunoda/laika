@@ -7,6 +7,7 @@ laika = require('./_laika');
 var optionsParser = commander
   .usage('[options] [path filter]')
   .option('-m, --mport <port>', 'specify mongodb port [default: 27017]', 27017)
+  .option('-r, --murl <url>', 'specify mongodb url [default: localhost]', 'localhost')
   .option('-u, --ui <tdd|bdd>', 'specify test user interfaces (tdd|bdd) [default: tdd]', 'tdd')
   .option('-R, --reporter <reporter>', 'specify reporter to use (support all mocha reporters) [default: spec]', 'spec')
   .option('-s, --settings <settings-file>', 'specify a settings file for your meteor app')
