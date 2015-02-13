@@ -105,7 +105,7 @@ h1 {
 }
 
 #content {
-	
+
 }
 
 #content img {
@@ -163,4 +163,21 @@ h1 {
 #page {
 	width: 700px;
 	float: left;
+}
+
+.archived-notice {
+	padding: 40px 40px 25px 40px;
+	border: 0;
+	margin: 10px 0;
+	background-color: rgb(86, 30, 69);
+	color: #ddd;
+	font-size: 16px;
+}
+
+.archived-notice a {
+	color: #ddd;
+}
+
+.archived-notice li {
+	margin-bottom: 5px;
 }
