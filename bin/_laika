@@ -46,7 +46,7 @@ module.exports = {
     dropLaikaDbs(checkMongoDB);
 
     function checkMongoDB() {
-      var mongoUrl = "mongodb://localhost:" + argv.mport;
+      var mongoUrl = "mongodb://" + argv.murl + ":" + argv.mport;
       helpers.checkForMongoDB(mongoUrl, function(connected, err) {
         if(connected) {
           initialize();
@@ -60,7 +60,7 @@ module.exports = {
     function initialize() {
       logger.info('\n  injecting laika...');
       injector.inject();
-      App.touch(deps.tick.bind(deps), {mongoPort: argv.mport});
+      App.touch(deps.tick.bind(deps), {mongoPort: argv.mport, settingsFile: argv.settings});
 
       logger.info('  loading phantomjs...');
       Phantom.create(afterPhantomCreated, {parameters: {
@@ -183,7 +183,7 @@ module.exports = {
 
         phantom._phantom.stdout.removeListener('data', onPhantomLogs);
         phantom._phantom.stderr.removeListener('data', onPhantomLogs);
-        phantom.exit();
+        phantom._phantom.kill();
 
         appPool.close(function() {
           process.exit(exitCode);
