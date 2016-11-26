@@ -163,6 +163,9 @@ module.exports = {
       var files = fs.readdirSync(dir);
 
       files.forEach(function(file) {
+        if (file === 'node_modules') {
+          return;
+        }
         var filename = path.resolve(dir, file);
         var stat = fs.statSync(filename);
         if(stat.isDirectory()) {
