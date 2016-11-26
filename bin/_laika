@@ -38,6 +38,7 @@ module.exports = {
     var isSourceFileAllowed = generateIsSourceFileAllowed(compilers);
 
     helpers.makeAssertFiberFriendly();
+    helpers.exportFibers();
 
     //laika drops dbs after the test without any problem
     //if if you close laika with "CTRL + C" or laika got some internal error
